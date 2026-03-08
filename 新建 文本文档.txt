@@ -1,0 +1,52 @@
+现在已经有一个html，主要是前端代码，用来满足前端操作功能
+对于股票的数据获取，现在有一个方法，就是用python来提供数据爬取，并为前端提供搜索、股票的历史价格k线等等
+实现方式是用akshare，运行python。这里我举例几个爬取的方式，主要从新浪或者雪球爬取，都可以
+#首先打开python
+PS C:\Users\Administrator> python
+Python 3.14.3 (tags/v3.14.3:323c59a, Feb  3 2026, 16:04:56) [MSC v.1944 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+
+#再导入你要的库，并运行你找的股票，例如平安银行。时间可以自己定最新的
+import akshare as ak
+
+stock_zh_a_daily_qfq_df = ak.stock_zh_a_daily(symbol="sz000001", start_date="19910403", end_date="20231027", adjust="qfq")
+print(stock_zh_a_daily_qfq_df)
+
+#再例如个股赛力斯的基础数据
+import akshare as ak
+
+stock_individual_basic_info_xq_df = ak.stock_individual_basic_info_xq(symbol="SH601127")
+print(stock_individual_basic_info_xq_df)
+
+帮我搭建好后端，并对接好前端对应资料的查询
+
+
+
+
+现在的后端接口是无法查询到etf相关内容的，我需要保证前端搜索和查看k线能够支持etf相关内容呈现。根据akshare指引文档获取etf相关的py示例方式是这样的
+
+#ETF基金实时行情-同花顺爬取，这个实时行情暂时不知道你会不会想用到，我先提供了
+接口: fund_etf_spot_ths
+目标地址: https://fund.10jqka.com.cn/datacenter/jz/kfs/etf/
+import akshare as ak
+
+fund_etf_spot_ths_df = ak.fund_etf_spot_ths(date="20240620")
+print(fund_etf_spot_ths_df)
+#数据示例
+   序号    基金代码         基金名称  ...  最新-累计净值  基金类型    查询日期
+0      1  159691            高股息ETF港股  ...   1.2039   股票型  2024-06-20
+
+
+#而历史行情 ，是可以从新浪获取
+接口: fund_etf_hist_sina
+目标地址: http://vip.stock.finance.sina.com.cn/fund_center/index.html#jjhqetf
+#接口示例
+import akshare as ak
+
+fund_etf_hist_sina_df = ak.fund_etf_hist_sina(symbol="sh510050")
+print(fund_etf_hist_sina_df)
+数据示例
+
+            date   open   high    low  close      volume
+0     2005-02-23  0.881  0.882  0.866  0.876  1269742542
+1     2005-02-24  0.876  0.876  0.868  0.876   451614223
