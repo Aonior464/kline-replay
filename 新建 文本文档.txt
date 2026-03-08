@@ -50,3 +50,16 @@ print(fund_etf_hist_sina_df)
             date   open   high    low  close      volume
 0     2005-02-23  0.881  0.882  0.866  0.876  1269742542
 1     2005-02-24  0.876  0.876  0.868  0.876   451614223
+
+
+回退指令
+以后在任何新对话窗口中，要回退到当前版本，执行以下命令：
+
+
+cd "d:\APP TOTAL\Test\UI test"
+git reset --hard 1a5cfd7
+或者查看当前状态和历史：
+
+
+git log --oneline    # 查看提交历史
+git status           # 查看当前状态

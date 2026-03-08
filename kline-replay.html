@@ -577,8 +577,23 @@ function renderC(dataLen,resetView){
     zS=Math.max(0,((dataLen-vis+PAD_RIGHT*0.25)/totalLen)*100);
   }else{zS=savedZoom.start;zE=savedZoom.end;}
 
+  // 计算当前视口中的K线数量，动态调整K线宽度
+  const viewRange = zE - zS;
+  const visibleCount = Math.ceil((dataLen * viewRange) / 100);
+  let barMinW=4,barMaxW=30;
+  if(visibleCount>200){barMinW=2;barMaxW=12;}
+  else if(visibleCount>100){barMinW=3;barMaxW=18;}
+  else if(visibleCount>50){barMinW=4;barMaxW=24;}
+
   const opt={
     backgroundColor:'#fff',animation:false,
+    legend:{
+      data:['MA5','MA10','MA20','MA60'],
+      top:6,left:'center',
+      itemWidth:16,itemHeight:10,
+      textStyle:{color:'#787b86',fontSize:11},
+      inactiveColor:'#e0e3eb'
+    },
     tooltip:{
       trigger:'axis',
       axisPointer:{type:'cross',crossStyle:{color:'#787b86',width:1},lineStyle:{color:'#787b86',width:1,type:'dashed'}},
@@ -589,6 +604,11 @@ function renderC(dataLen,resetView){
         if(i==null||i>=dataLen)return'';
         const d=fullData[i];if(!d)return'';
         const up=d.close>=d.open,c=up?'#ef5350':'#26a69a';
+        // 获取均线值
+        const ma5Val=i>=4?ma5[i]:null;
+        const ma10Val=i>=9?ma10[i]:null;
+        const ma20Val=i>=19?ma20[i]:null;
+        const ma60Val=i>=59?ma60[i]:null;
         return`<div style="font-weight:600;margin-bottom:4px">${d.date}</div>`+
           `<div style="display:grid;grid-template-columns:auto auto;gap:2px 12px;font-size:11px">`+
           `<span style="color:#787b86">开盘</span><span style="color:${c};font-weight:500">${d.open.toFixed(2)}</span>`+
@@ -597,11 +617,15 @@ function renderC(dataLen,resetView){
           `<span style="color:#787b86">收盘</span><span style="color:${c};font-weight:500">${d.close.toFixed(2)}</span>`+
           `<span style="color:#787b86">涨跌</span><span style="color:${c};font-weight:500">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span>`+
           `<span style="color:#787b86">成交量</span><span style="font-weight:500">${fV(d.vol)}</span>`+
+          `<span style="color:#f5a623">MA5</span><span style="font-weight:500">${ma5Val?ma5Val.toFixed(2):'-'}</span>`+
+          `<span style="color:#4fc3f7">MA10</span><span style="font-weight:500">${ma10Val?ma10Val.toFixed(2):'-'}</span>`+
+          `<span style="color:#ce93d8">MA20</span><span style="font-weight:500">${ma20Val?ma20Val.toFixed(2):'-'}</span>`+
+          `<span style="color:#81c784">MA60</span><span style="font-weight:500">${ma60Val?ma60Val.toFixed(2):'-'}</span>`+
           `<span style="color:#787b86">换手率</span><span style="font-weight:500">${d.turn}%</span></div>`;
       }
     },
     axisPointer:{link:[{xAxisIndex:'all'}],label:{backgroundColor:'#505862',color:'#fff',fontSize:10,padding:[3,6]}},
-    grid:[{left:10,right:56,top:28,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
+    grid:[{left:10,right:56,top:50,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
     xAxis:[
       {type:'category',data:pd.dates,gridIndex:0,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{color:'#787b86',fontSize:10},splitLine:{show:true,lineStyle:{color:'rgba(224,227,235,.35)'}},boundaryGap:true,axisPointer:{label:{show:true},snap:true}},
       {type:'category',data:pd.dates,gridIndex:1,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{show:false},splitLine:{show:false},boundaryGap:true,axisPointer:{label:{show:false}}}
@@ -612,12 +636,12 @@ function renderC(dataLen,resetView){
     ],
     dataZoom:[{type:'inside',xAxisIndex:[0,1],start:zS,end:zE}],
     series:[
-      {name:'K',type:'candlestick',xAxisIndex:0,yAxisIndex:0,data:pd.ohlc,itemStyle:{color:'#ef5350',color0:'#26a69a',borderColor:'#ef5350',borderColor0:'#26a69a',borderWidth:1},barMinWidth:4,barMaxWidth:30},
-      {name:'MA5',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma5,smooth:true,showSymbol:false,lineStyle:{width:1,color:'#f5a623'}},
-      {name:'MA10',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma10,smooth:true,showSymbol:false,lineStyle:{width:1,color:'#4fc3f7'}},
-      {name:'MA20',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma20,smooth:true,showSymbol:false,lineStyle:{width:1,color:'#ce93d8'}},
-      {name:'MA60',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma60,smooth:true,showSymbol:false,lineStyle:{width:1,color:'#81c784'}},
-      {name:'V',type:'bar',xAxisIndex:1,yAxisIndex:1,data:pd.vols,itemStyle:{color:p=>{const d=fullData[p.dataIndex];return d&&d.close>=d.open?'rgba(239,83,80,.35)':'rgba(38,166,154,.35)';}},barMinWidth:3,barMaxWidth:28}
+      {name:'K',type:'candlestick',xAxisIndex:0,yAxisIndex:0,data:pd.ohlc,itemStyle:{color:'#ef5350',color0:'#26a69a',borderColor:'#ef5350',borderColor0:'#26a69a',borderWidth:1},barMinWidth:barMinW,barMaxWidth:barMaxW},
+      {name:'MA5',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma5,smooth:0.3,showSymbol:false,lineStyle:{width:1.5,color:'#f5a623'}},
+      {name:'MA10',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma10,smooth:0.3,showSymbol:false,lineStyle:{width:1.5,color:'#4fc3f7'}},
+      {name:'MA20',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma20,smooth:0.3,showSymbol:false,lineStyle:{width:1.5,color:'#ce93d8'}},
+      {name:'MA60',type:'line',xAxisIndex:0,yAxisIndex:0,data:pma60,smooth:0.3,showSymbol:false,lineStyle:{width:1.5,color:'#81c784'}},
+      {name:'V',type:'bar',xAxisIndex:1,yAxisIndex:1,data:pd.vols,itemStyle:{color:p=>{const d=fullData[p.dataIndex];return d&&d.close>=d.open?'rgba(239,83,80,.35)':'rgba(38,166,154,.35)';}},barMinWidth:Math.max(2,barMinW-1),barMaxWidth:Math.max(20,barMaxW-2)}
     ]
   };
   if(!rpMode&&dataLen>0){const last=fullData[dataLen-1],up=last.chg>=0;opt.series[0].markLine={silent:true,symbol:'none',lineStyle:{color:up?'#ef5350':'#26a69a',type:'dashed',width:1,opacity:.5},label:{position:'end',formatter:last.close.toFixed(2),color:'#fff',backgroundColor:up?'#ef5350':'#26a69a',padding:[2,6],borderRadius:2,fontSize:10},data:[{yAxis:last.close}]};}

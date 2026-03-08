@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(python -m py_compile backend.py)",
-      "Bash(python test_etf.py)"
+      "Bash(python test_etf.py)",
+      "Bash(python test_weekly_monthly.py)"
     ]
   }
 }

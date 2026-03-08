@@ -209,6 +209,70 @@ async def search_stock(keyword: str = Query(..., description="搜索关键词"))
         return {"QuotationCodeTable": {"Data": []}}
 
 
+def resample_klines(df: pd.DataFrame, period: str) -> pd.DataFrame:
+    """
+    将日K数据转换为周K或月K
+    period: 'W'=周K, 'M'=月K
+    """
+    if df is None or df.empty:
+        return df
+
+    df = df.copy()
+    # 确保日期列是datetime类型
+    if "date" in df.columns:
+        df["date"] = pd.to_datetime(df["date"])
+        df = df.set_index("date")
+
+    # 定义聚合规则
+    agg_rules = {
+        "open": "first",
+        "high": "max",
+        "low": "min",
+        "close": "last",
+        "volume": "sum"
+    }
+    # 如果有成交额也求和
+    if "amount" in df.columns:
+        agg_rules["amount"] = "sum"
+
+    # 映射周期参数（兼容新版本pandas）
+    pd_period = period
+    if period == "W":
+        pd_period = "W"
+    elif period == "M":
+        pd_period = "ME"  # Month End
+
+    # 按周期聚合
+    resampled = df.resample(pd_period).agg(agg_rules)
+    resampled = resampled.dropna(subset=["open", "high", "low", "close"])
+
+    # 重置索引，恢复date列
+    resampled = resampled.reset_index()
+
+    # 计算涨跌幅等指标
+    if len(resampled) > 0:
+        resampled["change_pct"] = 0.0
+        resampled["change_amt"] = 0.0
+        resampled["amplitude"] = 0.0
+
+        for i in range(1, len(resampled)):
+            prev_close = resampled.iloc[i - 1]["close"]
+            curr_close = resampled.iloc[i]["close"]
+            curr_high = resampled.iloc[i]["high"]
+            curr_low = resampled.iloc[i]["low"]
+
+            resampled.at[resampled.index[i], "change_amt"] = curr_close - prev_close
+            if prev_close != 0:
+                resampled.at[resampled.index[i], "change_pct"] = (curr_close - prev_close) / prev_close * 100
+            if prev_close != 0:
+                resampled.at[resampled.index[i], "amplitude"] = (curr_high - curr_low) / prev_close * 100
+
+    # 格式化日期
+    resampled["date"] = resampled["date"].dt.strftime("%Y-%m-%d")
+
+    return resampled
+
+
 @app.get("/api/stock/kline")
 async def get_kline(
     secid: str = Query(..., description="证券ID，格式: 1.600000 或 0.000001"),
@@ -218,7 +282,7 @@ async def get_kline(
     end: str = Query("20500101", description="结束日期，格式: 20250101")
 ):
     """
-    获取K线数据（支持股票和ETF）
+    获取K线数据（支持股票和ETF，支持日/周/月K）
     返回格式与东方财富API兼容
     """
     try:
@@ -228,7 +292,7 @@ async def get_kline(
         else:
             code = secid
 
-        # 解析日期
+        # 解析日期 - 获取日K数据时用更早的开始日期，方便周期转换
         start_date = beg if beg != "0" else "19900101"
         end_date = end
 
@@ -320,6 +384,14 @@ async def get_kline(
 
         if df is None or df.empty:
             return {"data": None}
+
+        # 根据klt参数转换周期
+        if klt == 102:
+            # 周K
+            df = resample_klines(df, "W")
+        elif klt == 103:
+            # 月K
+            df = resample_klines(df, "M")
 
         # 确保日期列是字符串格式
         if "date" in df.columns:
