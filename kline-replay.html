@@ -126,8 +126,11 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 .sim-pos-info{display:grid;grid-template-columns:1fr 1fr;gap:1px}
 .sim-pos-row{display:flex;justify-content:space-between;font-size:10px;padding:1px 0}
 .sim-pos-row span:first-child{color:var(--text2)} .sim-pos-row span:last-child{font-weight:500}
-.sim-sell-btn{position:absolute;top:8px;right:12px;height:22px;padding:0 10px;border-radius:4px;background:var(--dn);color:#fff;font-size:10px;font-weight:600;cursor:pointer;transition:.15s}
+.sim-sell-btn{height:22px;padding:0 10px;border-radius:4px;background:var(--dn);color:#fff;font-size:10px;font-weight:600;cursor:pointer;transition:.15s}
 .sim-sell-btn:hover{opacity:.85}
+.sim-sell-sm{height:20px;padding:0 8px;font-size:9px;font-weight:500;background:transparent;color:var(--dn);border:1px solid var(--dn)}
+.sim-sell-sm:hover{background:var(--dn);color:#fff}
+.sim-sell-btns{display:flex;gap:4px;padding:4px 12px 6px;justify-content:flex-end}
 .sim-actions{padding:0}
 .sim-action-info{display:flex;justify-content:space-between;align-items:center;padding:6px 12px 0;font-size:12px;font-weight:600}
 .sim-cur-price{color:var(--accent)}
@@ -148,7 +151,50 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 .sim-reset{padding:12px;text-align:center;border-bottom:none}
 .sim-reset-btn{height:26px;padding:0 16px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:11px;cursor:pointer;transition:.15s}
 .sim-reset-btn:hover{border-color:#ef5350;color:#ef5350}
+.hdr-reset-btn{height:18px;padding:0 8px;border-radius:4px;background:transparent;border:1px solid var(--border);color:var(--text2);font-size:9px;cursor:pointer;transition:.15s}
+.hdr-reset-btn:hover{border-color:#ef5350;color:#ef5350}
 .sim-no-stock{padding:24px 12px;text-align:center;color:var(--text3);font-size:12px;line-height:1.8}
+
+/* ===== Random Training ===== */
+.train-panel{padding:0}
+.train-start{padding:16px 12px;text-align:center;border-bottom:1px solid var(--border-l)}
+.train-main-btn{width:100%;height:40px;border-radius:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px;border:none}
+.train-main-btn:hover{background:var(--accent-h)}
+.train-main-btn:disabled{opacity:.5;cursor:wait}
+.train-opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.train-opt{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text2)}
+.train-opt label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.train-opt input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer}
+.train-opt select{height:26px;padding:0 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-family:var(--font);cursor:pointer;outline:none}
+.train-current{border-bottom:1px solid var(--border-l)}
+.train-cur-title{font-size:11px;font-weight:600;color:var(--text);padding:8px 12px 6px;border-bottom:1px solid var(--border-l)}
+.train-cur-body{padding:8px 12px}
+.train-cur-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+.train-cur-row span:first-child{color:var(--text2)} .train-cur-row span:last-child{font-weight:500}
+.train-cur-actions{display:flex;gap:6px;padding:8px 12px 10px}
+.train-reveal-btn{flex:1;height:30px;border-radius:6px;background:var(--bg);border:1px solid var(--accent);color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
+.train-reveal-btn:hover{background:var(--accent-bg)}
+.train-next-btn{flex:1;height:30px;border-radius:6px;background:var(--accent);border:none;color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
+.train-next-btn:hover{background:var(--accent-h)}
+.train-stats{border-bottom:1px solid var(--border-l)}
+.train-stats-title{font-size:11px;font-weight:600;color:var(--text);padding:8px 12px 6px;border-bottom:1px solid var(--border-l)}
+.train-stats-body{padding:8px 12px}
+.train-stat-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+.train-stat-row span:first-child{color:var(--text2)} .train-stat-row span:last-child{font-weight:500}
+.train-stat-empty{padding:16px 12px;text-align:center;color:var(--text3);font-size:11px}
+.train-reset{padding:12px;text-align:center}
+.train-reset-btn{height:26px;padding:0 16px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:11px;cursor:pointer;transition:.15s}
+.train-reset-btn:hover{border-color:#ef5350;color:#ef5350}
+.train-blind-tag{display:inline-block;padding:1px 6px;border-radius:4px;background:#ffc107;color:#000;font-size:9px;font-weight:600;margin-left:4px}
+.train-trade-section{margin:8px 0;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border-l);border-radius:6px}
+.train-trade-hdr{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px;color:var(--text-s)}
+.train-trade-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.train-trade-row .sim-qty-sel{flex:1}
+.train-trade-row .sim-buy-btn,.train-trade-row .sim-sellall-btn{padding:4px 10px;font-size:11px}
+.train-pos-row{display:flex;justify-content:space-between;align-items:center;gap:4px;padding:4px 0;font-size:11px;border-top:1px solid var(--border-l)}
+.train-pos-sell-btns{display:flex;gap:4px;justify-content:flex-end;padding:2px 0 4px}
+.train-pos-sell-btns .sim-sell-btn{padding:2px 8px;font-size:10px}
+.train-cash-row{font-size:10px;color:var(--text-s);text-align:right;padding-top:4px}
 
 /* ===== Search Modal ===== */
 .sm{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;padding-top:60px}
@@ -204,7 +250,7 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
   </div>
   <div class="resize-handle" id="resizeH"></div>
   <div class="right-panel" id="rightPanel">
-    <div class="rp-tabs"><button class="rp-tab act" data-t="wl">自选股</button><button class="rp-tab" data-t="sim">模拟账户</button></div>
+    <div class="rp-tabs"><button class="rp-tab act" data-t="wl">自选股</button><button class="rp-tab" data-t="sim">模拟账户</button><button class="rp-tab" data-t="train">随机训练</button></div>
     <div class="rp-body" id="rpBody"></div>
   </div>
 </div>
@@ -240,6 +286,7 @@ let recent=[], sFocIdx=-1, detail=null, curTab='wl';
 let savedZoom=null;
 let simAccount=null, simIdCounter=0;
 const SIM_INITIAL=100000;
+let trainStockPool=[], trainPoolExpiry=0, trainSession=null, trainStats=null, trainBlindPref=false;
 
 const $=id=>document.getElementById(id);
 
@@ -459,7 +506,7 @@ function openS(){$('sMod').classList.add('show');$('sInp').value='';$('sInp').fo
 function closeS(){$('sMod').classList.remove('show');}
 function renderRc(){if(!recent.length){$('rcT').style.display='none';$('rcL').innerHTML='';return;}$('rcT').style.display='block';$('rcL').innerHTML=recent.map(s=>`<div class="si" data-c="${s.code}" data-n="${s.name}" data-s="${s.secid}" data-m="${s.mkt}"><span class="c">${s.code}</span><span class="n">${s.name}</span><span class="m">${s.mkt==0?'深A':s.mkt==1?'沪A':'北A'}</span></div>`).join('');}
 async function doS(kw){if(!kw.trim()){$('rsL').innerHTML='';$('rsT').style.display='none';return;}try{console.log('搜索:', kw);const d=await searchStocks(kw);console.log('搜索响应:', d);const its=(d&&d.QuotationCodeTable&&d.QuotationCodeTable.Data)||[];$('rsT').style.display='block';if(!its.length){$('rsL').innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">无结果</div>';return;}$('rsL').innerHTML=its.slice(0,10).map(it=>{const m=it.MarketId||it.MktNum;const secid=(m==1?'1.':'0.')+it.Code;return`<div class="si" data-c="${it.Code}" data-n="${it.Name}" data-s="${secid}" data-m="${m}"><span class="c">${it.Code}</span><span class="n">${it.Name}</span><span class="m">${m==0?'深A':m==1?'沪A':m==2?'北A':'其他'}</span></div>`;}).join('');sFocIdx=-1;}catch(e){console.error('搜索错误:', e);}}
-function selItem(el){curStock={code:el.dataset.c,name:el.dataset.n,secid:el.dataset.s,mkt:el.dataset.m};addRc(curStock);closeS();loadK();}
+function selItem(el){if(trainSession)endTrain();curStock={code:el.dataset.c,name:el.dataset.n,secid:el.dataset.s,mkt:el.dataset.m};addRc(curStock);closeS();loadK();}
 $('sInp').addEventListener('input',()=>{clearTimeout(sTm);sTm=setTimeout(()=>doS($('sInp').value),300);});
 $('sInp').addEventListener('keydown',e=>{const its=$('sRes').querySelectorAll('.si');if(e.key==='ArrowDown'){e.preventDefault();sFocIdx=Math.min(sFocIdx+1,its.length-1);its.forEach((el,i)=>el.classList.toggle('fc',i===sFocIdx));if(its[sFocIdx])its[sFocIdx].scrollIntoView({block:'nearest'});}else if(e.key==='ArrowUp'){e.preventDefault();sFocIdx=Math.max(sFocIdx-1,0);its.forEach((el,i)=>el.classList.toggle('fc',i===sFocIdx));}else if(e.key==='Enter'){e.preventDefault();if(sFocIdx>=0&&its[sFocIdx])selItem(its[sFocIdx]);else if(its.length)selItem(its[0]);}else if(e.key==='Escape')closeS();});
 $('sRes').addEventListener('click',e=>{const i=e.target.closest('.si');if(i)selItem(i);});
@@ -601,13 +648,14 @@ function buildPad(len){
 }
 function updSym(){
   if(!curStock||!dailyData.length)return;
-  $('sc').textContent=curStock.code;$('sn').textContent=curStock.name;
+  const isBlind=trainSession&&trainSession.blind&&!trainSession.revealed;
+  $('sc').textContent=isBlind?'???':curStock.code;$('sn').textContent=isBlind?'随机训练中':curStock.name;
   const L=dailyData[dailyData.length-1],up=L.chg>=0,c=up?'pu':'pd';
-  $('cp').className='pr '+c;$('cp').textContent=L.close.toFixed(2);
-  $('cc').className='cg '+c;$('cc').textContent=(up?'+':'')+L.chgA+'  '+(up?'+':'')+L.chg.toFixed(2)+'%';
+  $('cp').className='pr '+c;$('cp').textContent=isBlind?'--':L.close.toFixed(2);
+  $('cc').className='cg '+c;$('cc').textContent=isBlind?'--':((up?'+':'')+L.chgA+'  '+(up?'+':'')+L.chg.toFixed(2)+'%');
   $('pi').style.display='flex';$('pd2').style.display='';
   updFavBtn();
-  document.title=curStock.name+' '+L.close.toFixed(2)+' - K线回放';
+  document.title=isBlind?'随机训练 - K线回放':(curStock.name+' '+L.close.toFixed(2)+' - K线回放');
 }
 
 // ===== Detail Panel =====
@@ -677,7 +725,7 @@ async function loadDetail(){
   }
   renderTab();
 }
-function renderTab(){if(curTab==='wl'){renderWl();return;}if(curTab==='sim'){renderSim();return;}}
+function renderTab(){if(curTab==='wl'){renderWl();return;}if(curTab==='sim'){renderSim();return;}if(curTab==='train'){renderTrain();return;}}
 function renderInfo(){const d=detail;$('rpBody').innerHTML=`<div class="info-sec"><div class="info-title">行情</div><div class="info-row"><span class="info-k">今开</span><span class="info-v">${d.open}</span></div><div class="info-row"><span class="info-k">昨收</span><span class="info-v">${d.preClose}</span></div><div class="info-row"><span class="info-k">最高</span><span class="info-v pu">${d.high}</span></div><div class="info-row"><span class="info-k">最低</span><span class="info-v pd">${d.low}</span></div><div class="info-row"><span class="info-k">成交量</span><span class="info-v">${d.vol}</span></div><div class="info-row"><span class="info-k">成交额</span><span class="info-v">${d.amt}</span></div><div class="info-row"><span class="info-k">振幅</span><span class="info-v">${d.amp}</span></div><div class="info-row"><span class="info-k">换手率</span><span class="info-v">${d.turn}</span></div><div class="info-title">估值</div><div class="info-row"><span class="info-k">总市值</span><span class="info-v">${d.cap}</span></div><div class="info-row"><span class="info-k">流通市值</span><span class="info-v">${d.circCap}</span></div><div class="info-row"><span class="info-k">市盈率PE</span><span class="info-v">${d.pe}</span></div><div class="info-row"><span class="info-k">市净率PB</span><span class="info-v">${d.pb}</span></div><div class="info-row"><span class="info-k">行业</span><span class="info-v">${d.industry}</span></div></div>`;}
 function renderInst(){const d=detail,total=d.buy+d.ow+d.hold+d.uw+d.sell;if(!total){$('rpBody').innerHTML='<div class="info-sec"><div class="info-title">机构评级</div><div style="padding:20px 0;text-align:center;color:var(--text3);font-size:12px">暂无数据</div></div>';return;}const bP=(d.buy/total*100).toFixed(0),oP=(d.ow/total*100).toFixed(0),hP=(d.hold/total*100).toFixed(0),dP=((d.uw+d.sell)/total*100).toFixed(0),bull=+bP+ +oP;let v='机构意见分歧，建议观望';if(bull>=70)v='机构普遍看好，多数建议买入或增持';else if(bull>=50)v='机构整体偏乐观，可关注';$('rpBody').innerHTML=`<div class="info-sec"><div class="info-title">机构评级 · ${total}家</div><div class="rat-bar">${d.buy?`<div style="width:${bP}%;background:#26a69a"></div>`:''}${d.ow?`<div style="width:${oP}%;background:#66bb6a"></div>`:''}${d.hold?`<div style="width:${hP}%;background:#ffa726"></div>`:''}${(d.uw+d.sell)?`<div style="width:${dP}%;background:#ef5350"></div>`:''}</div><div class="rat-leg"><span><span class="rat-dot" style="background:#26a69a"></span>买入 ${d.buy}</span><span><span class="rat-dot" style="background:#66bb6a"></span>增持 ${d.ow}</span><span><span class="rat-dot" style="background:#ffa726"></span>中性 ${d.hold}</span><span><span class="rat-dot" style="background:#ef5350"></span>减持 ${d.uw+d.sell}</span></div><div class="rat-sum">${v}<br>看好占比 <b>${bull}%</b>（${d.buy+d.ow}家）<br><span style="font-size:10px;color:var(--text3)">数据来源东方财富，仅供参考</span></div></div>`;}
 document.querySelector('.rp-tabs').addEventListener('click',e=>{const t=e.target.closest('.rp-tab');if(!t)return;document.querySelector('.rp-tab.act').classList.remove('act');t.classList.add('act');curTab=t.dataset.t;renderTab();});
@@ -817,14 +865,21 @@ function onMM(p){
 function updOHLC(d){
   if(!d)return;const up=d.close>=d.open,c=up?'var(--up)':'var(--dn)';
   const pn=curKlt==='101'?'日K':curKlt==='102'?'周K':'月K';
-  $('ohlc').innerHTML=`<span class="ot">${curStock?curStock.name:''} ${pn}</span><span><span class="ol">开 </span><span class="ov" style="color:${c}">${d.open.toFixed(2)}</span></span><span><span class="ol">高 </span><span class="ov" style="color:${c}">${d.high.toFixed(2)}</span></span><span><span class="ol">低 </span><span class="ov" style="color:${c}">${d.low.toFixed(2)}</span></span><span><span class="ol">收 </span><span class="ov" style="color:${c}">${d.close.toFixed(2)}</span></span><span><span class="ov" style="color:${c}">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span></span><span><span class="ol">量 </span><span class="ov" style="color:var(--text2)">${fV(d.vol)}</span></span>`;
+  const isBlind=trainSession&&trainSession.blind&&!trainSession.revealed;
+  const sName=isBlind?'???':(curStock?curStock.name:'');
+  $('ohlc').innerHTML=`<span class="ot">${sName} ${pn}</span><span><span class="ol">开 </span><span class="ov" style="color:${c}">${d.open.toFixed(2)}</span></span><span><span class="ol">高 </span><span class="ov" style="color:${c}">${d.high.toFixed(2)}</span></span><span><span class="ol">低 </span><span class="ov" style="color:${c}">${d.low.toFixed(2)}</span></span><span><span class="ol">收 </span><span class="ov" style="color:${c}">${d.close.toFixed(2)}</span></span><span><span class="ov" style="color:${c}">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span></span><span><span class="ol">量 </span><span class="ov" style="color:var(--text2)">${fV(d.vol)}</span></span>`;
 }
 function onDbl(p){if(!fullData.length)return;const i=p.dataIndex;if(i==null||i<0||i>=fullData.length)return;const z=chart.getOption().dataZoom[0];savedZoom={start:z.start,end:z.end};const clickDate=fullData[i].date;const dailyIdx=findDailyDateIdx(clickDate)+1;enterRp(dailyIdx);toast('从 '+fullData[i].date+' 开始回放');}
 
 // ===== Replay =====
 function setRpBtns(v){$('bPl').disabled=!v;$('bPv').disabled=!v;$('bNx').disabled=!v;$('prg').disabled=!v;$('spd').disabled=!v;}
 function enterRp(dailyIdx){
-  rpMode=true;$('rpTgl').classList.add('on');$('rpBdg').classList.add('show');setRpBtns(true);
+  rpMode=true;$('rpTgl').classList.add('on');
+  const isBlind=trainSession&&trainSession.blind&&!trainSession.revealed;
+  $('rpBdg').innerHTML=trainSession?
+    (isBlind?'<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>随机训练 · 盲盒':'<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>随机训练'):
+    '<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>回放中';
+  $('rpBdg').classList.add('show');setRpBtns(true);
   if(dailyIdx!=null)dailyVisibleLen=dailyIdx;
   if(dailyVisibleLen<1)dailyVisibleLen=Math.min(60,dailyData.length);
   if(dailyVisibleLen>dailyData.length)dailyVisibleLen=dailyData.length;
@@ -838,7 +893,7 @@ function enterRp(dailyIdx){
   renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
 }
-function exitRp(){stopP();rpMode=false;$('rpTgl').classList.remove('on');$('rpBdg').classList.remove('show');setRpBtns(false);}
+function exitRp(skipTrainEnd){stopP();rpMode=false;$('rpTgl').classList.remove('on');$('rpBdg').classList.remove('show');setRpBtns(false);if(!skipTrainEnd&&trainSession)endTrain();}
 function showAll(){exitRp();dailyVisibleLen=dailyData.length;fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;buildPad(visibleLen);savedZoom=null;renderC(visibleLen,true);if(visibleLen>0)updOHLC(fullData[visibleLen-1]);updPrg();}
 function stepF(){
   if(dailyVisibleLen>=dailyData.length){stopP();return;}
@@ -873,6 +928,7 @@ function stepF(){
   renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
   if(!playing&&curTab==='sim')renderSim();
+  if(!playing&&curTab==='train'&&trainSession)renderTrain();
 }
 function stepB(){
   if(dailyVisibleLen<=1)return;
@@ -889,6 +945,7 @@ function stepB(){
   buildPad(visibleLen);updPrg();renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
   if(!playing&&curTab==='sim')renderSim();
+  if(!playing&&curTab==='train'&&trainSession)renderTrain();
 }
 function startP(){if(!rpMode)return;if(dailyVisibleLen>=dailyData.length)enterRp(Math.min(60,dailyData.length));playing=true;$('bPl').classList.add('playing');$('plIc').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';tick();}
 function stopP(){playing=false;clearTimeout(playTm);$('bPl').classList.remove('playing');$('plIc').innerHTML='<path d="M8 5v14l11-7z"/>';}
@@ -947,6 +1004,7 @@ function bindWlAll(){
   // Stock item click
   $('rpBody').querySelectorAll('.wl-item').forEach(el=>{
     el.addEventListener('click',()=>{
+      if(trainSession)endTrain();
       curStock={code:el.dataset.c,name:el.dataset.n,secid:el.dataset.s,mkt:el.dataset.m};loadK();
     });
   });
@@ -956,7 +1014,7 @@ function addWl(){if(!curStock){toast('请先搜索股票');return;}const grp=wlG
 function rmWl(code){const grp=wlGroups[activeWlGroup];if(grp)wlGroups[activeWlGroup]=grp.filter(s=>s.code!==code);saveWl();if(curTab==='wl')renderWl();updFavBtn();}
 // ===== Favorite Toggle =====
 function isInWl(){if(!curStock)return false;return(wlGroups[activeWlGroup]||[]).some(s=>s.code===curStock.code);}
-function updFavBtn(){const btn=$('bFav'),td=$('favTd'),ic=$('favIc');if(!btn||!td)return;if(!curStock){btn.style.display='none';td.style.display='none';return;}btn.style.display='';td.style.display='';const inWl=isInWl();btn.classList.toggle('faved',inWl);btn.title=inWl?'取消收藏':'收藏到 '+activeWlGroup;if(ic)ic.setAttribute('d',inWl?'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z':'M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z');}
+function updFavBtn(){const btn=$('bFav'),td=$('favTd'),ic=$('favIc');if(!btn||!td)return;const isBlind=trainSession&&trainSession.blind&&!trainSession.revealed;if(!curStock||isBlind){btn.style.display='none';td.style.display='none';return;}btn.style.display='';td.style.display='';const inWl=isInWl();btn.classList.toggle('faved',inWl);btn.title=inWl?'取消收藏':'收藏到 '+activeWlGroup;if(ic)ic.setAttribute('d',inWl?'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z':'M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z');}
 function toggleFav(){if(!curStock){toast('请先搜索股票');return;}const grp=wlGroups[activeWlGroup]||(wlGroups[activeWlGroup]=[]);const idx=grp.findIndex(s=>s.code===curStock.code);if(idx>=0){grp.splice(idx,1);toast(curStock.name+' 已取消收藏');}else{const L=dailyData.length?dailyData[dailyData.length-1]:null;grp.push({code:curStock.code,name:curStock.name,secid:curStock.secid,mkt:curStock.mkt,lp:L?L.close:null,chg:L?L.chg:null});toast(curStock.name+' 已加入 '+activeWlGroup);}saveWl();updFavBtn();if(curTab==='wl')renderWl();}
 async function refWl(){
   const grp=wlGroups[activeWlGroup]||[];
@@ -1077,26 +1135,59 @@ function simBuy(shares){
   simAccount.cash-=cost;
   simAccount.positions.push({id:++simIdCounter,code:curStock.code,name:curStock.name,secid:curStock.secid,shares:shares,buyPrice:d.close,buyDate:d.date});
   simAccount.history.push({id:++simIdCounter,code:curStock.code,name:curStock.name,direction:'buy',shares:shares,price:d.close,date:d.date,pnl:null,pnlPct:null});
-  saveSim();toast('买入 '+curStock.name+' '+shares+'股 @'+d.close.toFixed(2));
+  saveSim();const dn=(trainSession&&trainSession.blind&&!trainSession.revealed)?'???':curStock.name;toast('买入 '+dn+' '+shares+'股 @'+d.close.toFixed(2));
   if(chart&&fullData.length){renderC(visibleLen,false);}
   if(curTab==='sim')renderSim();
 }
-function simSell(posId){
+function simSell(posId,sellShares){
   if(!curStock||!dailyData.length)return;
   const d=getSimPrice();if(!d)return;
   const idx=simAccount.positions.findIndex(p=>p.id===posId);if(idx<0)return;
   const pos=simAccount.positions[idx];
-  const revenue=d.close*pos.shares;
-  const pnl=revenue-pos.buyPrice*pos.shares;
+  const shares=sellShares&&sellShares<pos.shares?sellShares:pos.shares;
+  const revenue=d.close*shares;
+  const pnl=revenue-pos.buyPrice*shares;
   const pnlPct=(d.close-pos.buyPrice)/pos.buyPrice*100;
   simAccount.cash+=revenue;
-  simAccount.positions.splice(idx,1);
-  simAccount.history.push({id:++simIdCounter,code:pos.code,name:pos.name,direction:'sell',shares:pos.shares,price:d.close,date:d.date,buyPrice:pos.buyPrice,pnl:pnl,pnlPct:pnlPct});
+  if(shares>=pos.shares){simAccount.positions.splice(idx,1);}
+  else{pos.shares-=shares;}
+  simAccount.history.push({id:++simIdCounter,code:pos.code,name:pos.name,direction:'sell',shares:shares,price:d.close,date:d.date,buyPrice:pos.buyPrice,pnl:pnl,pnlPct:pnlPct});
   saveSim();
   const sign=pnl>=0?'+':'';
-  toast('卖出 '+pos.name+' '+pos.shares+'股 @'+d.close.toFixed(2)+' '+sign+pnl.toFixed(2));
+  const sn2=(trainSession&&trainSession.blind&&!trainSession.revealed)?'???':pos.name;
+  toast('卖出 '+sn2+' '+shares+'股 @'+d.close.toFixed(2)+' '+sign+pnl.toFixed(2));
   if(chart&&fullData.length){renderC(visibleLen,false);}
   if(curTab==='sim')renderSim();
+  if(curTab==='train')renderTrain();
+}
+function simSellByCode(code,sellShares){
+  if(!curStock||!dailyData.length)return;
+  const d=getSimPrice();if(!d)return;
+  const posArr=simAccount.positions.filter(p=>p.code===code);
+  if(!posArr.length)return;
+  let remain=sellShares;
+  let totalPnl=0,totalShares=0,totalCost=0;
+  for(let i=0;i<posArr.length&&remain>0;i++){
+    const pos=posArr[i];
+    const qty=Math.min(remain,pos.shares);
+    const revenue=d.close*qty;
+    const cost=pos.buyPrice*qty;
+    totalPnl+=revenue-cost;totalShares+=qty;totalCost+=cost;
+    simAccount.cash+=revenue;
+    if(qty>=pos.shares){const idx=simAccount.positions.indexOf(pos);if(idx>=0)simAccount.positions.splice(idx,1);}
+    else{pos.shares-=qty;}
+    remain-=qty;
+  }
+  const avgCost=totalShares>0?totalCost/totalShares:0;
+  const pnlPct=avgCost>0?(d.close-avgCost)/avgCost*100:0;
+  simAccount.history.push({id:++simIdCounter,code:code,name:posArr[0].name,direction:'sell',shares:totalShares,price:d.close,date:d.date,buyPrice:avgCost,pnl:totalPnl,pnlPct:pnlPct});
+  saveSim();
+  const sign=totalPnl>=0?'+':'';
+  const sn2=(trainSession&&trainSession.blind&&!trainSession.revealed)?'???':posArr[0].name;
+  toast('卖出 '+sn2+' '+totalShares+'股 @'+d.close.toFixed(2)+' '+sign+totalPnl.toFixed(2));
+  if(chart&&fullData.length){renderC(visibleLen,false);}
+  if(curTab==='sim')renderSim();
+  if(curTab==='train')renderTrain();
 }
 function simSellAll(){
   if(!curStock||!dailyData.length)return;
@@ -1104,9 +1195,15 @@ function simSellAll(){
   if(!cur.length){toast('无持仓可卖出');return;}
   cur.forEach(p=>simSell(p.id));
 }
+function calcSellShares(total,ratio){
+  const s=Math.floor(total*ratio/100)*100;
+  return s<100?0:s;
+}
 function renderSim(){
   const body=$('rpBody');
   if(!simAccount){body.innerHTML='<div class="sim-no-stock">加载中...</div>';return;}
+  // 如果正在训练且盲盒模式，用训练中的股票作为simBuy/sell的上下文
+  const isBlind=trainSession&&trainSession.blind&&!trainSession.revealed;
   const d=getSimPrice();
   const curPrice=d?d.close:null;
   // 计算持仓市值
@@ -1129,35 +1226,47 @@ function renderSim(){
   html+='<div class="sim-row"><span class="sim-k">持仓市值</span><span class="sim-v">'+posValue.toFixed(2)+'</span></div>';
   html+='<div class="sim-row"><span class="sim-k">总盈亏</span><span class="sim-v '+pc+'">'+ps+totalPnl.toFixed(2)+' ('+ps+totalPnlPct.toFixed(2)+'%)</span></div>';
   html+='</div>';
-  // 当前持仓
+  // 当前持仓（按股票聚合）
   const positions=simAccount.positions;
-  html+='<div class="sim-section"><div class="sim-title">持仓 · '+positions.length+'笔</div>';
-  if(!positions.length){html+='<div class="sim-empty">暂无持仓</div>';}
+  const posMap={};
+  positions.forEach(p=>{
+    if(!posMap[p.code])posMap[p.code]={code:p.code,name:p.name,shares:0,cost:0,ids:[]};
+    posMap[p.code].shares+=p.shares;posMap[p.code].cost+=p.buyPrice*p.shares;posMap[p.code].ids.push(p.id);
+  });
+  const posGroups=Object.values(posMap);
+  html+='<div class="sim-section"><div class="sim-title">持仓 · '+posGroups.length+'只</div>';
+  if(!posGroups.length){html+='<div class="sim-empty">暂无持仓</div>';}
   else{
-    positions.forEach(p=>{
-      let cp=p.buyPrice,unrealPnl=0,unrealPct=0,hasLive=false;
-      if(curStock&&p.code===curStock.code&&curPrice){cp=curPrice;unrealPnl=(curPrice-p.buyPrice)*p.shares;unrealPct=(curPrice-p.buyPrice)/p.buyPrice*100;hasLive=true;}
+    posGroups.forEach(g=>{
+      const avgCost=g.cost/g.shares;
+      let unrealPnl=0,unrealPct=0,hasLive=false;
+      if(curStock&&g.code===curStock.code&&curPrice){unrealPnl=(curPrice-avgCost)*g.shares;unrealPct=(curPrice-avgCost)/avgCost*100;hasLive=true;}
       const uc=unrealPnl>=0?'pu':'pd';const us=unrealPnl>=0?'+':'';
       html+='<div class="sim-pos-item">';
-      html+='<div class="sim-pos-hdr"><span class="sim-pos-name">'+p.name+'</span><span class="sim-pos-code">'+p.code+'</span></div>';
+      html+='<div class="sim-pos-hdr"><span class="sim-pos-name">'+(isBlind&&curStock&&g.code===curStock.code?'???':g.name)+'</span><span class="sim-pos-code">'+(isBlind&&curStock&&g.code===curStock.code?'???':g.code)+'</span></div>';
       html+='<div class="sim-pos-info">';
-      html+='<div class="sim-pos-row"><span>数量</span><span>'+p.shares+'股</span></div>';
-      html+='<div class="sim-pos-row"><span>成本</span><span>'+p.buyPrice.toFixed(2)+'</span></div>';
-      html+='<div class="sim-pos-row"><span>买入日</span><span>'+p.buyDate+'</span></div>';
+      html+='<div class="sim-pos-row"><span>数量</span><span>'+g.shares+'股</span></div>';
+      html+='<div class="sim-pos-row"><span>成本均价</span><span>'+avgCost.toFixed(2)+'</span></div>';
       if(hasLive){
         html+='<div class="sim-pos-row"><span>现价</span><span class="'+uc+'">'+curPrice.toFixed(2)+'</span></div>';
         html+='<div class="sim-pos-row"><span>盈亏</span><span class="'+uc+'">'+us+unrealPnl.toFixed(2)+'</span></div>';
         html+='<div class="sim-pos-row"><span>涨跌</span><span class="'+uc+'">'+us+unrealPct.toFixed(2)+'%</span></div>';
       }
       html+='</div>';
-      if(curStock&&p.code===curStock.code)html+='<button class="sim-sell-btn" data-pid="'+p.id+'">卖出</button>';
+      if(curStock&&g.code===curStock.code){
+        html+='<div class="sim-sell-btns">';
+        html+='<button class="sim-sell-btn sim-sell-sm" data-code="'+g.code+'" data-ratio="0.333">卖1/3</button>';
+        html+='<button class="sim-sell-btn sim-sell-sm" data-code="'+g.code+'" data-ratio="0.5">卖1/2</button>';
+        html+='<button class="sim-sell-btn sim-sell-sm" data-code="'+g.code+'" data-ratio="1">卖出</button>';
+        html+='</div>';
+      }
       html+='</div>';
     });
   }
   html+='</div>';
   // 交易操作
   if(curStock&&dailyData.length){
-    html+='<div class="sim-section sim-actions"><div class="sim-title">交易 · '+curStock.name+'</div>';
+    html+='<div class="sim-section sim-actions"><div class="sim-title">交易 · '+(isBlind?'???':curStock.name)+'</div>';
     html+='<div class="sim-action-info"><span>'+(d?d.date:'')+'</span><span class="sim-cur-price">'+(curPrice?curPrice.toFixed(2):'--')+'</span></div>';
     html+='<div class="sim-action-row">';
     html+='<select class="sim-qty-sel" id="simQty"><option value="100">100股</option><option value="300">300股</option><option value="500">500股</option><option value="1000">1000股</option><option value="2000">2000股</option></select>';
@@ -1170,7 +1279,7 @@ function renderSim(){
   }
   // 交易记录
   const hist=[...simAccount.history].reverse();
-  html+='<div class="sim-section"><div class="sim-title">交易记录 · '+hist.length+'笔</div>';
+  html+='<div class="sim-section"><div class="sim-title" style="display:flex;justify-content:space-between;align-items:center">交易记录 · '+hist.length+'笔<button class="hdr-reset-btn" id="simResetBtn">重置账户</button></div>';
   if(!hist.length){html+='<div class="sim-empty">暂无记录</div>';}
   else{
     hist.slice(0,50).forEach(t=>{
@@ -1179,7 +1288,7 @@ function renderSim(){
       const dirText=isBuy?'买入':'卖出';
       html+='<div class="sim-trade-item">';
       html+='<div class="sim-trade-hdr"><span class="sim-trade-date">'+t.date+'</span><span class="'+dirClass+'">'+dirText+'</span></div>';
-      html+='<div class="sim-trade-body"><span class="sim-trade-name">'+t.name+'</span><span>'+t.shares+'股 @'+t.price.toFixed(2)+'</span></div>';
+      html+='<div class="sim-trade-body"><span class="sim-trade-name">'+(isBlind&&curStock&&t.code===curStock.code?'???':t.name)+'</span><span>'+t.shares+'股 @'+t.price.toFixed(2)+'</span></div>';
       if(!isBuy&&t.pnl!=null){
         const tc=t.pnl>=0?'pu':'pd';const ts2=t.pnl>=0?'+':'';
         html+='<div class="sim-trade-pnl '+tc+'">'+ts2+t.pnl.toFixed(2)+' ('+ts2+t.pnlPct.toFixed(2)+'%)</div>';
@@ -1189,19 +1298,364 @@ function renderSim(){
     if(hist.length>50)html+='<div class="sim-empty">仅显示最近50条</div>';
   }
   html+='</div>';
-  // 重置
-  html+='<div class="sim-reset"><button class="sim-reset-btn" id="simResetBtn">重置账户</button></div>';
   html+='</div>';
   body.innerHTML=html;
   // 绑定事件
-  body.querySelectorAll('.sim-sell-btn').forEach(btn=>{btn.addEventListener('click',()=>simSell(+btn.dataset.pid));});
+  body.querySelectorAll('.sim-sell-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const code=btn.dataset.code;const ratio=+btn.dataset.ratio;
+      const totalShares=simAccount.positions.filter(p=>p.code===code).reduce((s,p)=>s+p.shares,0);
+      if(ratio>=1){simSellByCode(code,totalShares);}
+      else{const qty=calcSellShares(totalShares,ratio);if(qty<=0){toast('持仓不足，无法部分卖出');return;}simSellByCode(code,qty);}
+    });
+  });
   const buyBtn=$('simBuyBtn');if(buyBtn)buyBtn.addEventListener('click',()=>simBuy(+$('simQty').value));
-  const sellAllBtn=$('simSellAllBtn');if(sellAllBtn)sellAllBtn.addEventListener('click',()=>{if(confirm('确定清仓 '+curStock.name+' 所有持仓？'))simSellAll();});
-  const resetBtn=$('simResetBtn');if(resetBtn)resetBtn.addEventListener('click',()=>{if(confirm('确定重置模拟账户？所有持仓和记录将清空。'))resetSim();});
+  const sellAllBtn=$('simSellAllBtn');if(sellAllBtn)sellAllBtn.addEventListener('click',()=>simSellAll());
+  const resetBtn=$('simResetBtn');if(resetBtn)resetBtn.addEventListener('click',()=>{resetSim();});
+}
+
+// ===== Random Training =====
+function loadTrainStats(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('trainStats'));
+    if(saved&&Array.isArray(saved.sessions)){trainStats=saved;}
+    else trainStats={sessions:[],totalCount:0,winCount:0};
+  }catch(e){trainStats={sessions:[],totalCount:0,winCount:0};}
+}
+function saveTrainStats(){localStorage.setItem('trainStats',JSON.stringify(trainStats));}
+
+async function fetchTrainPool(){
+  // 内存缓存有效
+  if(trainStockPool.length&&Date.now()<trainPoolExpiry)return trainStockPool;
+  // localStorage缓存（24小时）
+  try{
+    const cached=JSON.parse(localStorage.getItem('trainPool'));
+    if(cached&&cached.data&&cached.data.length&&cached.expiry>Date.now()){
+      trainStockPool=cached.data;
+      trainPoolExpiry=cached.expiry;
+      console.log('股票池从缓存加载:',trainStockPool.length,'只');
+      return trainStockPool;
+    }
+  }catch(e){}
+  // 优先后端API
+  if(await checkBackend()){
+    try{
+      const res=await fetch(BACKEND_URL+'/api/train/pool');
+      if(res.ok){
+        const json=await res.json();
+        if(json.data&&json.data.length){
+          trainStockPool=json.data;
+          trainPoolExpiry=Date.now()+86400000;
+          localStorage.setItem('trainPool',JSON.stringify({data:trainStockPool,expiry:trainPoolExpiry}));
+          console.log('股票池从后端加载:',trainStockPool.length,'只');
+          return trainStockPool;
+        }
+      }
+    }catch(e){console.warn('后端股票池请求失败:',e);}
+  }
+  toast('获取股票池失败，请确保后端服务已启动');
+  return null;
+}
+
+async function startRandomTrain(){
+  const blindCheck=$('trainBlind');
+  const histSel=$('trainHist');
+  const blind=blindCheck?blindCheck.checked:trainBlindPref;
+  trainBlindPref=blind;
+  const historyDays=histSel?+histSel.value:60;
+
+  // 获取股票池
+  const btn=$('trainStartBtn');
+  if(btn){btn.disabled=true;btn.textContent='加载股票池...';}
+  const pool=await fetchTrainPool();
+  if(!pool||!pool.length){if(btn){btn.disabled=false;btn.textContent='获取随机训练';}toast('股票池为空');return;}
+
+  // 随机选股
+  const stock=pool[Math.floor(Math.random()*pool.length)];
+  if(btn)btn.textContent='加载K线数据...';
+
+  // 结束之前的训练
+  if(trainSession)endTrain(true);
+
+  // 设置curStock并加载数据
+  curStock={code:stock.code,name:stock.name,secid:stock.secid,mkt:stock.mkt};
+  exitRp(true);ld(true);$('chHint').classList.add('hidden');
+  const data=await fetchEastmoneyKline(curStock);
+  if(!data||!data.data||!data.data.klines||!data.data.klines.length){
+    toast('K线数据加载失败，换一只试试');ld(false);
+    if(btn){btn.disabled=false;btn.textContent='获取随机训练';}
+    return;
+  }
+  parseD(data.data);
+  dailyVisibleLen=dailyData.length;
+  fullData=toViewData(curKlt,dailyVisibleLen);
+  visibleLen=fullData.length;
+
+  // 随机选起始位置
+  const minIdx=Math.max(historyDays,60);
+  const maxIdx=dailyData.length-120;
+  if(maxIdx<=minIdx){
+    toast('该股票数据不足，换一只');ld(false);
+    if(btn){btn.disabled=false;btn.textContent='获取随机训练';}
+    return;
+  }
+  const startIdx=minIdx+Math.floor(Math.random()*(maxIdx-minIdx));
+
+  // 创建训练会话
+  trainSession={
+    stockCode:stock.code,
+    stockName:stock.name,
+    stockSecid:stock.secid,
+    stockMkt:stock.mkt,
+    stockCap:null,
+    stockIndex:stock.index||'',
+    startDate:dailyData[startIdx-1].date,
+    startIdx:startIdx,
+    blind:blind,
+    revealed:false,
+    startCash:simAccount?simAccount.cash:SIM_INITIAL,
+    startPositions:simAccount?simAccount.positions.filter(p=>p.code===stock.code).length:0,
+    startHistoryLen:simAccount?simAccount.history.length:0
+  };
+
+  // 初始化图表并进入回放
+  updSym();initChart();
+  savedZoom=null;
+  enterRp(startIdx);
+  ld(false);
+
+  // 切到模拟账户方便操作（但保持train tab状态）
+  toast(blind?'随机训练已开始 · 盲盒模式':'随机训练: '+stock.name);
+  if(btn){btn.disabled=false;btn.textContent='获取随机训练';}
+  if(curTab==='train')renderTrain();
+  hlWl();
+  // 异步获取市值
+  fetchStockCap(stock.code);
+}
+
+async function fetchStockCap(code){
+  try{
+    const res=await fetch(BACKEND_URL+'/api/stock/info?code='+code);
+    if(!res.ok)return;
+    const json=await res.json();
+    if(json.data&&json.data['总市值']){
+      const cap=+json.data['总市值'];
+      if(trainSession&&trainSession.stockCode===code){
+        trainSession.stockCap=cap;
+        if(curTab==='train')renderTrain();
+      }
+    }
+  }catch(e){}
+}
+
+function revealTrain(){
+  if(!trainSession)return;
+  trainSession.revealed=true;
+  updSym();
+  if(curTab==='train')renderTrain();
+  toast('揭晓: '+trainSession.stockName+' ('+trainSession.stockCode+')');
+}
+
+// 计算训练期间基于买卖交易的盈亏（非总资金盈亏）
+function calcTrainTradePnl(){
+  if(!simAccount||!trainSession)return{pnl:0,pnlPct:0,trades:0,totalCost:0};
+  const code=trainSession.stockCode;
+  // 按训练开始时的history索引截取，避免日期比较问题
+  const startIdx=trainSession.startHistoryLen||0;
+  const recent=simAccount.history.slice(startIdx).filter(h=>h.code===code);
+  const sells=recent.filter(h=>h.direction==='sell');
+  const buys=recent.filter(h=>h.direction==='buy');
+  // 已卖出的交易：已实现盈亏
+  let realizedPnl=sells.reduce((s,h)=>s+(h.pnl||0),0);
+  let totalCost=sells.reduce((s,h)=>s+(h.buyPrice||h.price)*h.shares,0);
+  // 未卖出持仓：浮动盈亏
+  const d=getSimPrice();
+  simAccount.positions.filter(p=>p.code===code).forEach(p=>{
+    const curPrice=d?d.close:p.buyPrice;
+    totalCost+=p.buyPrice*p.shares;
+    realizedPnl+=(curPrice-p.buyPrice)*p.shares;
+  });
+  const pnlPct=totalCost>0?(realizedPnl/totalCost*100):0;
+  return{pnl:realizedPnl,pnlPct,trades:buys.length+sells.length,totalCost};
+}
+
+function endTrain(silent){
+  if(!trainSession)return;
+  // 基于交易盈亏结算
+  const tp=calcTrainTradePnl();
+  const pnlPct=tp.pnlPct;
+  const trades=tp.trades;
+
+  const session={
+    date:new Date().toISOString().substring(0,10),
+    code:trainSession.stockCode,
+    name:trainSession.stockName,
+    pnlPct:+pnlPct.toFixed(2),
+    trades:trades,
+    blind:trainSession.blind
+  };
+  trainStats.sessions.unshift(session);
+  trainStats.totalCount++;
+  if(pnlPct>0)trainStats.winCount++;
+  // 只保留最近100条
+  if(trainStats.sessions.length>100)trainStats.sessions=trainStats.sessions.slice(0,100);
+  saveTrainStats();
+
+  if(!silent)toast('训练结束 · '+(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%');
+  trainSession=null;
+  updSym();
+  if(curTab==='train')renderTrain();
+}
+
+function renderTrain(){
+  const body=$('rpBody');
+  if(!trainStats)loadTrainStats();
+  let html='<div class="train-panel">';
+
+  // 开始按钮区域
+  html+='<div class="train-start">';
+  html+='<button class="train-main-btn" id="trainStartBtn">&#x1F3B2; 获取随机训练</button>';
+  html+='<div class="train-opts">';
+  html+='<div class="train-opt"><label><input type="checkbox" id="trainBlind"'+((trainSession?trainSession.blind:trainBlindPref)?' checked':'')+'>盲盒模式（隐藏股票名）</label></div>';
+  html+='<div class="train-opt"><span>历史可见K线</span><select id="trainHist"><option value="30">30根</option><option value="60" selected>60根</option><option value="120">120根</option><option value="200">200根</option></select></div>';
+  html+='</div></div>';
+
+  // 当前训练状态
+  if(trainSession){
+    const displayName=trainSession.blind&&!trainSession.revealed?'???':trainSession.stockName+' ('+trainSession.stockCode+')';
+    const tp=calcTrainTradePnl();
+    const trades=tp.trades;
+    const curPnl=tp.pnl;
+    const pnlPct=tp.pnlPct;
+    const pc=curPnl>=0?'pu':'pd';
+    const ps=curPnl>=0?'+':'';
+
+    html+='<div class="train-current">';
+    html+='<div class="train-cur-title">当前训练'+(trainSession.blind&&!trainSession.revealed?'<span class="train-blind-tag">盲盒</span>':'')+'</div>';
+    html+='<div class="train-cur-body">';
+    html+='<div class="train-cur-row"><span>股票</span><span>'+displayName+'</span></div>';
+    html+='<div class="train-cur-row"><span>起始日期</span><span>'+trainSession.startDate+'</span></div>';
+    const capLabel=trainSession.stockCap?((trainSession.stockCap/100000000).toFixed(0)+'亿'):(trainSession.stockIndex==='hs300'?'沪深300成分':'中证500成分');
+    html+='<div class="train-cur-row" style="opacity:.55;font-size:10px"><span>市值</span><span>'+capLabel+'</span></div>';
+    html+='<div class="train-cur-row"><span>已操作</span><span>'+trades+'笔</span></div>';
+    html+='<div class="train-cur-row"><span>训练盈亏</span><span class="'+pc+'">'+ps+curPnl.toFixed(2)+' ('+ps+pnlPct.toFixed(2)+'%)</span></div>';
+    html+='</div>';
+
+    // 训练内嵌交易操作
+    const d=getSimPrice();
+    const curPrice=d?d.close:null;
+    if(curStock&&curPrice){
+      html+='<div class="train-trade-section">';
+      html+='<div class="train-trade-hdr"><span>'+(d?d.date:'')+'</span><span style="font-weight:700">'+(curPrice?curPrice.toFixed(2):'--')+'</span></div>';
+      html+='<div class="train-trade-row">';
+      html+='<select class="sim-qty-sel" id="trainQty"><option value="100">100股</option><option value="300">300股</option><option value="500">500股</option><option value="1000">1000股</option><option value="2000">2000股</option></select>';
+      html+='<button class="sim-buy-btn" id="trainBuyBtn">买入</button>';
+      // 当前持仓 - 显示卖出按钮
+      const curPos=simAccount?simAccount.positions.filter(p=>p.code===curStock.code):[];
+      if(curPos.length){
+        html+='<button class="sim-sellall-btn" id="trainSellAllBtn">清仓</button>';
+      }
+      html+='</div>';
+      // 显示当前持仓简况（聚合同股票）
+      if(simAccount){
+        const curPos2=simAccount.positions.filter(p=>p.code===curStock.code);
+        if(curPos2.length){
+          const totalShares=curPos2.reduce((s,p)=>s+p.shares,0);
+          const totalCost=curPos2.reduce((s,p)=>s+p.buyPrice*p.shares,0);
+          const avgCost=totalCost/totalShares;
+          const unrealPnl=(curPrice-avgCost)*totalShares;
+          const unrealPct=(curPrice-avgCost)/avgCost*100;
+          const uc=unrealPnl>=0?'pu':'pd';const us=unrealPnl>=0?'+':'';
+          html+='<div class="train-pos-row">';
+          html+='<span>'+totalShares+'股 @'+avgCost.toFixed(2)+'</span>';
+          html+='<span class="'+uc+'">'+us+unrealPnl.toFixed(2)+' ('+us+unrealPct.toFixed(2)+'%)</span>';
+          html+='</div>';
+          html+='<div class="train-pos-sell-btns">';
+          html+='<button class="sim-sell-btn sim-sell-sm train-sell-single" data-code="'+curStock.code+'" data-ratio="0.333">卖1/3</button>';
+          html+='<button class="sim-sell-btn sim-sell-sm train-sell-single" data-code="'+curStock.code+'" data-ratio="0.5">卖1/2</button>';
+          html+='<button class="sim-sell-btn sim-sell-sm train-sell-single" data-code="'+curStock.code+'" data-ratio="1">卖出</button>';
+          html+='</div>';
+        }
+        html+='<div class="train-cash-row">可用: '+simAccount.cash.toFixed(2)+'</div>';
+      }
+      html+='</div>';
+    }
+
+    html+='<div class="train-cur-actions">';
+    if(trainSession.blind&&!trainSession.revealed){
+      html+='<button class="train-reveal-btn" id="trainRevealBtn">&#x1F50D; 揭晓答案</button>';
+    }
+    html+='<button class="train-next-btn" id="trainNextBtn">&#x27A1; 下一题</button>';
+    html+='</div>';
+    html+='</div>';
+  }
+
+  // 训练统计
+  html+='<div class="train-stats">';
+  html+='<div class="train-stats-title" style="display:flex;justify-content:space-between;align-items:center">训练统计'+(trainStats.totalCount>0?'<button class="hdr-reset-btn" id="trainResetBtn">清空统计</button>':'')+'</div>';
+  if(trainStats.totalCount>0){
+    const winRate=(trainStats.winCount/trainStats.totalCount*100).toFixed(1);
+    const avgPnl=trainStats.sessions.length?
+      (trainStats.sessions.reduce((s,t)=>s+t.pnlPct,0)/trainStats.sessions.length).toFixed(2):'0';
+    const maxWin=trainStats.sessions.length?
+      Math.max(...trainStats.sessions.map(t=>t.pnlPct)).toFixed(2):'0';
+    const maxLoss=trainStats.sessions.length?
+      Math.min(...trainStats.sessions.map(t=>t.pnlPct)).toFixed(2):'0';
+    const ac=+avgPnl>=0?'pu':'pd';
+    html+='<div class="train-stats-body">';
+    html+='<div class="train-stat-row"><span>总训练</span><span>'+trainStats.totalCount+'次</span></div>';
+    html+='<div class="train-stat-row"><span>胜率</span><span class="'+(+winRate>=50?'pu':'pd')+'">'+winRate+'% ('+trainStats.winCount+'/'+trainStats.totalCount+')</span></div>';
+    html+='<div class="train-stat-row"><span>平均收益</span><span class="'+ac+'">'+(+avgPnl>=0?'+':'')+avgPnl+'%</span></div>';
+    html+='<div class="train-stat-row"><span>最大盈利</span><span class="pu">+'+maxWin+'%</span></div>';
+    html+='<div class="train-stat-row"><span>最大亏损</span><span class="pd">'+maxLoss+'%</span></div>';
+    html+='</div>';
+
+    // 最近训练记录
+    html+='<div class="train-stats-title">最近记录</div>';
+    trainStats.sessions.slice(0,10).forEach(s=>{
+      const sc=s.pnlPct>=0?'pu':'pd';
+      const ss=s.pnlPct>=0?'+':'';
+      html+='<div style="padding:6px 12px;border-bottom:1px solid var(--border-l);font-size:11px;display:flex;justify-content:space-between;align-items:center">';
+      html+='<span>'+s.name+(s.blind?' <span class="train-blind-tag">盲</span>':'')+'</span>';
+      html+='<span class="'+sc+'" style="font-weight:600">'+ss+s.pnlPct+'%</span>';
+      html+='</div>';
+    });
+  }else{
+    html+='<div class="train-stat-empty">暂无训练记录<br>点击上方按钮开始第一次训练</div>';
+  }
+  html+='</div>';
+
+  html+='</div>';
+  body.innerHTML=html;
+
+  // 绑定事件
+  const startBtn=$('trainStartBtn');
+  if(startBtn)startBtn.addEventListener('click',startRandomTrain);
+  const revealBtn=$('trainRevealBtn');
+  if(revealBtn)revealBtn.addEventListener('click',revealTrain);
+  const nextBtn=$('trainNextBtn');
+  if(nextBtn)nextBtn.addEventListener('click',()=>{endTrain();startRandomTrain();});
+  // 训练面板内嵌交易按钮
+  const tBuyBtn=$('trainBuyBtn');
+  if(tBuyBtn)tBuyBtn.addEventListener('click',()=>{simBuy(+$('trainQty').value);if(curTab==='train')renderTrain();});
+  const tSellAllBtn=$('trainSellAllBtn');
+  if(tSellAllBtn)tSellAllBtn.addEventListener('click',()=>{simSellAll();});
+  body.querySelectorAll('.train-sell-single').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const code=btn.dataset.code;const ratio=+btn.dataset.ratio;
+      const totalShares=simAccount.positions.filter(p=>p.code===code).reduce((s,p)=>s+p.shares,0);
+      if(ratio>=1){simSellByCode(code,totalShares);}
+      else{const qty=calcSellShares(totalShares,ratio);if(qty<=0){toast('持仓不足，无法部分卖出');return;}simSellByCode(code,qty);}
+    });
+  });
+  const resetBtn=$('trainResetBtn');
+  if(resetBtn)resetBtn.addEventListener('click',()=>{
+    trainStats={sessions:[],totalCount:0,winCount:0};saveTrainStats();renderTrain();toast('统计已清空');
+  });
 }
 
 // ===== Init =====
-loadSt();loadSim();renderTab();refWl();
+loadSt();loadSim();loadTrainStats();renderTab();refWl();
 })();
 </script>
 </body>

@@ -30,6 +30,10 @@ _stock_list_cache = None
 _etf_list_cache = None
 _list_cache_time = None
 
+# 缓存训练股票池
+_train_pool_cache = None
+_train_pool_cache_time = None
+
 # 内置常用ETF列表（作为后备）
 BUILTIN_ETFS = [
     # AI/科技主线
@@ -492,6 +496,91 @@ async def get_money_flow(secid: str = Query(..., description="证券ID")):
         }
     except Exception as e:
         return {"data": None}
+
+
+@app.get("/api/train/pool")
+async def get_train_pool():
+    """
+    获取随机训练股票池
+    使用沪深300 + 中证500成分股（共~800只大市值A股）
+    结果缓存24小时
+    """
+    global _train_pool_cache, _train_pool_cache_time
+
+    # 24小时缓存
+    if (_train_pool_cache is not None and
+        _train_pool_cache_time is not None and
+        (datetime.now() - _train_pool_cache_time).total_seconds() < 86400):
+        return {"data": _train_pool_cache, "cached": True}
+
+    try:
+        pool = []
+        seen_codes = set()
+
+        # 获取沪深300 + 中证500成分股
+        for index_code in ['000300', '000905']:
+            index_label = 'hs300' if index_code == '000300' else 'csi500'
+            try:
+                df = ak.index_stock_cons_csindex(symbol=index_code)
+                if df is not None and not df.empty:
+                    # 列: 日期, 指数代码, 指数名称, 指数英文名称, 成分券代码, 成分券名称, 成分券英文名称, 交易所, 交易所英文名称
+                    code_col = df.columns[4]  # 成分券代码
+                    name_col = df.columns[5]  # 成分券名称
+                    exchange_col = df.columns[7]  # 交易所
+
+                    for _, row in df.iterrows():
+                        code = str(row[code_col]).strip()
+                        name = str(row[name_col]).strip()
+                        exchange = str(row[exchange_col]).strip()
+
+                        if code in seen_codes:
+                            continue
+                        # 排除ST
+                        if 'ST' in name.upper():
+                            continue
+
+                        seen_codes.add(code)
+                        # 判断市场: 6开头=沪市(1), 其他=深市(0)
+                        mkt = "1" if code.startswith("6") else "0"
+                        pool.append({
+                            "code": code,
+                            "name": name,
+                            "mkt": mkt,
+                            "secid": f"{mkt}.{code}",
+                            "index": index_label,
+                        })
+                    print(f"指数 {index_code} 获取成功: {len(df)}只")
+            except Exception as e:
+                print(f"获取指数 {index_code} 成分股失败: {e}")
+
+        if pool:
+            _train_pool_cache = pool
+            _train_pool_cache_time = datetime.now()
+            print(f"训练股票池加载完成: {len(pool)}只")
+        else:
+            print("警告: 训练股票池为空")
+
+        return {"data": pool, "cached": False}
+
+    except Exception as e:
+        print(f"获取训练股票池失败: {e}")
+        return {"data": [], "error": str(e)}
+
+
+@app.get("/api/stock/info")
+async def get_stock_info(code: str = Query(..., description="股票代码，如600519")):
+    """获取单只股票基本信息（含总市值）"""
+    try:
+        df = ak.stock_individual_info_em(symbol=code)
+        if df is None or df.empty:
+            return {"data": None}
+        info = {}
+        for _, row in df.iterrows():
+            info[str(row.iloc[0])] = row.iloc[1]
+        return {"data": info}
+    except Exception as e:
+        print(f"获取股票信息失败 {code}: {e}")
+        return {"data": None, "error": str(e)}
 
 
 @app.get("/api/quote")
