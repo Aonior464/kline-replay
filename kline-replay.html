@@ -110,6 +110,46 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 .rat-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 .rat-sum{margin-top:10px;font-size:11px;color:var(--text2);line-height:1.6;padding:8px 10px;background:var(--panel);border-radius:8px}
 
+/* ===== Simulation Account ===== */
+.sim-panel{padding:0}
+.sim-summary{padding:10px 12px;border-bottom:1px solid var(--border-l);background:var(--panel)}
+.sim-title{font-size:11px;font-weight:600;color:var(--text);padding:8px 12px 6px;border-bottom:1px solid var(--border-l)}
+.sim-total{padding:6px 0 4px;display:flex;justify-content:space-between;align-items:baseline}
+.sim-total-label{font-size:11px;color:var(--text2)}.sim-total-value{font-size:18px;font-weight:700}
+.sim-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+.sim-k{color:var(--text2)} .sim-v{font-weight:500}
+.sim-section{border-bottom:1px solid var(--border-l)}
+.sim-empty{padding:16px 12px;text-align:center;color:var(--text3);font-size:11px}
+.sim-pos-item{padding:8px 12px;border-bottom:1px solid var(--border-l);position:relative}
+.sim-pos-hdr{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.sim-pos-name{font-size:12px;font-weight:600} .sim-pos-code{font-size:10px;color:var(--text2)}
+.sim-pos-info{display:grid;grid-template-columns:1fr 1fr;gap:1px}
+.sim-pos-row{display:flex;justify-content:space-between;font-size:10px;padding:1px 0}
+.sim-pos-row span:first-child{color:var(--text2)} .sim-pos-row span:last-child{font-weight:500}
+.sim-sell-btn{position:absolute;top:8px;right:12px;height:22px;padding:0 10px;border-radius:4px;background:var(--dn);color:#fff;font-size:10px;font-weight:600;cursor:pointer;transition:.15s}
+.sim-sell-btn:hover{opacity:.85}
+.sim-actions{padding:0}
+.sim-action-info{display:flex;justify-content:space-between;align-items:center;padding:6px 12px 0;font-size:12px;font-weight:600}
+.sim-cur-price{color:var(--accent)}
+.sim-action-row{display:flex;gap:6px;padding:6px 12px 10px}
+.sim-qty-sel{height:28px;padding:0 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-family:var(--font);cursor:pointer;outline:none;flex:1}
+.sim-buy-btn{height:28px;padding:0 14px;border-radius:6px;background:var(--up);color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;flex:1}
+.sim-buy-btn:hover{opacity:.85}
+.sim-sellall-btn{height:28px;padding:0 10px;border-radius:6px;background:var(--dn);color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;flex:1}
+.sim-sellall-btn:hover{opacity:.85}
+.sim-trade-item{padding:6px 12px;border-bottom:1px solid var(--border-l);font-size:11px}
+.sim-trade-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.sim-trade-date{color:var(--text2);font-size:10px}
+.sim-dir-buy{color:var(--up);font-weight:600;font-size:10px}
+.sim-dir-sell{color:var(--dn);font-weight:600;font-size:10px}
+.sim-trade-body{display:flex;justify-content:space-between;align-items:center}
+.sim-trade-name{font-weight:500}
+.sim-trade-pnl{text-align:right;font-weight:600;font-size:10px;padding-top:1px}
+.sim-reset{padding:12px;text-align:center;border-bottom:none}
+.sim-reset-btn{height:26px;padding:0 16px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:11px;cursor:pointer;transition:.15s}
+.sim-reset-btn:hover{border-color:#ef5350;color:#ef5350}
+.sim-no-stock{padding:24px 12px;text-align:center;color:var(--text3);font-size:12px;line-height:1.8}
+
 /* ===== Search Modal ===== */
 .sm{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;padding-top:60px}
 .sm.show{display:flex} .sm-bk{position:absolute;inset:0;background:rgba(0,0,0,.18)}
@@ -164,7 +204,7 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
   </div>
   <div class="resize-handle" id="resizeH"></div>
   <div class="right-panel" id="rightPanel">
-    <div class="rp-tabs"><button class="rp-tab act" data-t="wl">自选股</button><button class="rp-tab" data-t="info">概况</button><button class="rp-tab" data-t="inst">机构</button></div>
+    <div class="rp-tabs"><button class="rp-tab act" data-t="wl">自选股</button><button class="rp-tab" data-t="sim">模拟账户</button></div>
     <div class="rp-body" id="rpBody"></div>
   </div>
 </div>
@@ -192,16 +232,14 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 
 const PAD_RIGHT = 40; // 右侧空白填充根数，让K线不贴右边
 
-let chart=null, fullData=[], padData=[], visibleLen=0, playing=false, playTm=null, playSpd=1000;
+let chart=null, dailyData=[], fullData=[], padData=[], visibleLen=0, playing=false, playTm=null, playSpd=1000;
 let curStock=null, curKlt='101', sTm=null, rpMode=false;
+let dailyVisibleLen=0; // 回放位置（日K索引），始终以日K为基准
 let wlGroups={}, wlGroupNames=[], activeWlGroup='自选股';
 let recent=[], sFocIdx=-1, detail=null, curTab='wl';
 let savedZoom=null;
-// ===== 周期数据缓存（新增）=====
-let cachedDailyData=[]; // 缓存的日线数据
-let periodDataCache={}; // 各周期数据缓存: {'101': [...], '102': [...], '103': [...]}
-let switchPeriodWithoutReload=false; // 是否启用无刷新切换
-let dailyVisibleLen=0; // 专门记录日线索引，回放模式下保持不变
+let simAccount=null, simIdCounter=0;
+const SIM_INITIAL=100000;
 
 const $=id=>document.getElementById(id);
 
@@ -223,124 +261,6 @@ function fA(v){if(v>=1e8)return(v/1e8).toFixed(2)+'亿';if(v>=1e4)return(v/1e4).
 function fC(v){return v>=1e8?(v/1e8).toFixed(0)+'亿':fA(v);}
 let tTm;function toast(m){$('tst').textContent=m;$('tst').classList.add('show');clearTimeout(tTm);tTm=setTimeout(()=>$('tst').classList.remove('show'),2500);}
 function ld(v){$('ldBar').classList.toggle('show',v);}
-
-// ===== 周期合成函数（新增）=====
-// 解析日期字符串为Date对象
-function parseDateStr(s){
-  if(s.includes('-')){
-    const [y,m,d]=s.split('-').map(Number);
-    return new Date(y,m-1,d);
-  }
-  const y=+s.substring(0,4),m=+s.substring(4,6)-1,d=+s.substring(6,8);
-  return new Date(y,m,d);
-}
-// 判断是否为同一周（周一为一周开始）
-function isSameWeek(d1,d2){
-  const getMonday=(d)=>{
-    const dt=new Date(d);
-    const day=dt.getDay();
-    const diff=dt.getDate()-day+(day===0?-6:1);
-    dt.setDate(diff);
-    dt.setHours(0,0,0,0);
-    return dt;
-  };
-  return getMonday(d1).getTime()===getMonday(d2).getTime();
-}
-// 判断是否为同一月
-function isSameMonth(d1,d2){
-  return d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth();
-}
-// 从日线数据合成周K
-function synthesizeWeeklyFromDaily(daily, upToDate){
-  if(!daily||!daily.length)return [];
-  const result=[];
-  let currentWeek=null, weekOpen=null, weekHigh=-Infinity, weekLow=Infinity, weekClose=null;
-  let weekVol=0, weekAmt=0, weekFirstDate=null, weekLastDate=null, prevClose=null;
-  const upTo=upToDate?parseDateStr(upToDate):null;
-  for(let i=0;i<daily.length;i++){
-    const d=daily[i];
-    const dt=parseDateStr(d.date);
-    if(upTo && dt>upTo)break;
-    if(!currentWeek||!isSameWeek(dt,currentWeek)){
-      if(currentWeek!==null){
-        const baseClose=prevClose||weekOpen;
-        result.push({date:weekLastDate,open:weekOpen,close:weekClose,high:weekHigh,low:weekLow,vol:weekVol,amt:weekAmt,chg:((weekClose-baseClose)/baseClose*100),chgA:(weekClose-baseClose).toFixed(2),turn:''});
-        prevClose=weekClose;
-      }
-      currentWeek=new Date(dt);
-      weekOpen=d.open; weekHigh=d.high; weekLow=d.low; weekClose=d.close;
-      weekVol=d.vol; weekAmt=d.amt; weekFirstDate=d.date; weekLastDate=d.date;
-    }else{
-      weekHigh=Math.max(weekHigh,d.high); weekLow=Math.min(weekLow,d.low); weekClose=d.close;
-      weekVol+=d.vol; weekAmt+=d.amt; weekLastDate=d.date;
-    }
-  }
-  if(currentWeek!==null){
-    const baseClose=prevClose||weekOpen;
-    result.push({date:weekLastDate,open:weekOpen,close:weekClose,high:weekHigh,low:weekLow,vol:weekVol,amt:weekAmt,chg:((weekClose-baseClose)/baseClose*100),chgA:(weekClose-baseClose).toFixed(2),turn:''});
-  }
-  return result;
-}
-// 从日线数据合成月K
-function synthesizeMonthlyFromDaily(daily, upToDate){
-  if(!daily||!daily.length)return [];
-  const result=[];
-  let currentMonth=null, monthOpen=null, monthHigh=-Infinity, monthLow=Infinity, monthClose=null;
-  let monthVol=0, monthAmt=0, monthFirstDate=null, monthLastDate=null, prevClose=null;
-  const upTo=upToDate?parseDateStr(upToDate):null;
-  for(let i=0;i<daily.length;i++){
-    const d=daily[i];
-    const dt=parseDateStr(d.date);
-    if(upTo && dt>upTo)break;
-    if(!currentMonth||!isSameMonth(dt,currentMonth)){
-      if(currentMonth!==null){
-        const baseClose=prevClose||monthOpen;
-        result.push({date:monthLastDate,open:monthOpen,close:monthClose,high:monthHigh,low:monthLow,vol:monthVol,amt:monthAmt,chg:((monthClose-baseClose)/baseClose*100),chgA:(monthClose-baseClose).toFixed(2),turn:''});
-        prevClose=monthClose;
-      }
-      currentMonth=new Date(dt);
-      monthOpen=d.open; monthHigh=d.high; monthLow=d.low; monthClose=d.close;
-      monthVol=d.vol; monthAmt=d.amt; monthFirstDate=d.date; monthLastDate=d.date;
-    }else{
-      monthHigh=Math.max(monthHigh,d.high); monthLow=Math.min(monthLow,d.low); monthClose=d.close;
-      monthVol+=d.vol; monthAmt+=d.amt; monthLastDate=d.date;
-    }
-  }
-  if(currentMonth!==null){
-    const baseClose=prevClose||monthOpen;
-    result.push({date:monthLastDate,open:monthOpen,close:monthClose,high:monthHigh,low:monthLow,vol:monthVol,amt:monthAmt,chg:((monthClose-baseClose)/baseClose*100),chgA:(monthClose-baseClose).toFixed(2),turn:''});
-  }
-  return result;
-}
-// 找到目标日期在数据中的最近索引
-function findClosestDateIndex(targetDate, data){
-  if(!targetDate||!data||!data.length)return data.length-1;
-  const target=parseDateStr(targetDate);
-  let bestIdx=data.length-1, bestDiff=Infinity;
-  for(let i=0;i<data.length;i++){
-    const d=parseDateStr(data[i].date);
-    if(d<=target){
-      const diff=target.getTime()-d.getTime();
-      if(diff<bestDiff){bestDiff=diff;bestIdx=i;}
-    }
-  }
-  return bestIdx;
-}
-// 获取截止到指定日线索引的合成数据
-function getPeriodDataWithVisibleLen(klt, dailyLen){
-  const safeVisibleLen=Math.max(1, Math.min(dailyLen||dailyVisibleLen||cachedDailyData.length, cachedDailyData.length));
-  if(klt==='101'){
-    return cachedDailyData.slice(0, safeVisibleLen);
-  }
-  const upToDate=safeVisibleLen>0 && cachedDailyData.length?cachedDailyData[safeVisibleLen-1].date:null;
-  if(klt==='102'){
-    return synthesizeWeeklyFromDaily(cachedDailyData, upToDate);
-  }
-  if(klt==='103'){
-    return synthesizeMonthlyFromDaily(cachedDailyData, upToDate);
-  }
-  return cachedDailyData.slice(0, safeVisibleLen);
-}
 
 // ===== API配置 =====
 // 本地后端地址，如果本地后端未启动则自动降级到东方财富
@@ -412,7 +332,7 @@ async function tryJsonp(hosts, pathFn, callbackParam='cb'){
 // 本地后端获取K线
 async function fetchBackendKline(stock){
   const secid=stock.secid;
-  const klt=curKlt;
+  const klt='101'; // 始终获取日K，客户端聚合周K/月K
   const fqt=1;
   try{
     const res=await fetch(BACKEND_URL+'/api/stock/kline?secid='+encodeURIComponent(secid)+'&klt='+klt+'&fqt='+fqt+'&beg=0&end=20500101');
@@ -433,7 +353,7 @@ async function fetchEastmoneyKline(stock){
   }
   // 降级到东方财富
   const secid=stock.secid;
-  const klt=curKlt; // 101=日, 102=周, 103=月
+  const klt='101'; // 始终获取日K，客户端聚合周K/月K
   const fqt=1; // 前复权
 
   const pathFn=()=>'/api/qt/stock/kline/get?secid='+secid+'&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&klt='+klt+'&fqt='+fqt+'&beg=0&end=20500101';
@@ -547,11 +467,11 @@ $('sBk').addEventListener('click',closeS);
 $('symBtn').addEventListener('click',openS);
 
 // ===== Data =====
-async function loadK(){
+async function loadK(restoreDate, restoreRp){
   if(!curStock)return;exitRp();ld(true);$('chHint').classList.add('hidden');
   console.log('loadK: 加载股票', curStock);
 
-  // 使用东方财富API
+  // 使用东方财富API（始终获取日K）
   const data=await fetchEastmoneyKline(curStock);
   if(!data||!data.data||!data.data.klines||!data.data.klines.length){
     toast('未获取到K线数据，请检查网络');
@@ -563,23 +483,111 @@ async function loadK(){
   try{
     console.log('数据加载完成:', data.data.klines.length+'条');
     parseD(data.data);
+    dailyVisibleLen=dailyData.length;
+    fullData=toViewData(curKlt,dailyVisibleLen);
+    visibleLen=fullData.length;
     updSym();
     initChart();
-    showAll();
+    if(restoreDate && dailyData.length){
+      const dailyIdx=findDailyDateIdx(restoreDate);
+      if(restoreRp){
+        savedZoom=null;
+        dailyVisibleLen=dailyIdx+1;
+        fullData=toViewData(curKlt,dailyVisibleLen);
+        visibleLen=fullData.length;
+        enterRp();
+      } else {
+        showAll();
+      }
+    } else {
+      showAll();
+    }
     hlWl();
-    loadDetail();
+    if(curTab==='sim')renderSim();
   }catch(e){console.error('loadK render error:',e);toast('渲染失败: '+e.message);}
   ld(false);
 }
 function parseD(r){
-  fullData=r.klines.map(l=>{const p=l.split(',');return{date:p[0],open:+p[1],close:+p[2],high:+p[3],low:+p[4],vol:+p[5],amt:+p[6],amp:p[7],chg:+p[8],chgA:+p[9],turn:p[10]};});
-  buildPad(fullData.length);
-  // 如果是日线数据，缓存下来（新增）
-  if(curKlt==='101'){
-    cachedDailyData=fullData.slice();
-    periodDataCache['101']=fullData.slice();
-    console.log('已缓存日线数据:', cachedDailyData.length+'条');
+  dailyData=r.klines.map(l=>{const p=l.split(',');return{date:p[0],open:+p[1],close:+p[2],high:+p[3],low:+p[4],vol:+p[5],amt:+p[6],amp:p[7],chg:+p[8],chgA:+p[9],turn:p[10]};});
+}
+// 在新周期数据中查找最接近目标日期的索引（<=targetDate的最后一条）
+function findDateIdx(target){
+  let best=0;
+  for(let i=0;i<fullData.length;i++){
+    if(fullData[i].date<=target)best=i;else break;
   }
+  return best;
+}
+// 在dailyData中查找最接近目标日期的索引
+function findDailyDateIdx(target){
+  let best=0;
+  for(let i=0;i<dailyData.length;i++){
+    if(dailyData[i].date<=target)best=i;else break;
+  }
+  return best;
+}
+// ===== 周期聚合 =====
+function getISOWeekKey(dateStr){
+  const d=new Date(dateStr);
+  const tmp=new Date(d.getTime());
+  tmp.setDate(tmp.getDate()+3-((tmp.getDay()+6)%7));
+  const yearStart=new Date(tmp.getFullYear(),0,4);
+  const weekNum=1+Math.round(((tmp-yearStart)/86400000-3+((yearStart.getDay()+6)%7))/7);
+  return tmp.getFullYear()+'-W'+String(weekNum).padStart(2,'0');
+}
+function getMonthKey(dateStr){return dateStr.substring(0,7);}
+function aggregateCandles(dailySlice,keyFn){
+  if(!dailySlice.length)return[];
+  const groups=[];let curKey=null,cur=null;
+  for(const d of dailySlice){
+    const key=keyFn(d.date);
+    if(key!==curKey){
+      if(cur)groups.push(cur);
+      curKey=key;
+      cur={date:d.date,open:d.open,close:d.close,high:d.high,low:d.low,vol:d.vol,amt:d.amt,chg:0,chgA:0,amp:'0',turn:'-'};
+    }else{
+      cur.date=d.date;cur.close=d.close;
+      cur.high=Math.max(cur.high,d.high);cur.low=Math.min(cur.low,d.low);
+      cur.vol+=d.vol;cur.amt+=d.amt;
+    }
+  }
+  if(cur)groups.push(cur);
+  // 计算涨跌幅
+  for(let i=0;i<groups.length;i++){
+    const g=groups[i];
+    const prev=i>0?groups[i-1].close:g.open;
+    g.chg=prev?+((g.close-prev)/prev*100).toFixed(2):0;
+    g.chgA=+(g.close-prev).toFixed(2);
+    g.amp=prev?((g.high-g.low)/prev*100).toFixed(2):'0';
+  }
+  return groups;
+}
+function toViewData(klt,dailyLen){
+  const slice=dailyData.slice(0,dailyLen);
+  if(klt==='101')return slice;
+  if(klt==='102')return aggregateCandles(slice,getISOWeekKey);
+  if(klt==='103')return aggregateCandles(slice,getMonthKey);
+  return slice;
+}
+// 获取当前zoom对应的日期范围
+function getZoomDateRange(){
+  if(!savedZoom||!fullData.length)return null;
+  const totalLen=fullData.length+PAD_RIGHT;
+  const si=Math.max(0,Math.floor(savedZoom.start/100*totalLen));
+  const ei=Math.min(fullData.length-1,Math.floor(savedZoom.end/100*totalLen));
+  if(si>=fullData.length||ei<0)return null;
+  return{startDate:fullData[Math.min(si,fullData.length-1)].date,endDate:fullData[Math.min(ei,fullData.length-1)].date};
+}
+// 根据日期范围恢复zoom位置
+function restoreZoomByDate(range){
+  if(!range||!fullData.length){savedZoom=null;return;}
+  const totalLen=fullData.length+PAD_RIGHT;
+  let si=0,ei=fullData.length-1;
+  for(let i=0;i<fullData.length;i++){
+    if(fullData[i].date<=range.startDate)si=i;
+    if(fullData[i].date<=range.endDate)ei=i;
+  }
+  savedZoom={start:Math.max(0,(si/totalLen)*100),end:Math.min(100,((ei+PAD_RIGHT*0.25)/totalLen)*100)};
 }
 // 构建带右侧空白的数据
 function buildPad(len){
@@ -592,9 +600,9 @@ function buildPad(len){
   };
 }
 function updSym(){
-  if(!curStock||!fullData.length)return;
+  if(!curStock||!dailyData.length)return;
   $('sc').textContent=curStock.code;$('sn').textContent=curStock.name;
-  const L=fullData[fullData.length-1],up=L.chg>=0,c=up?'pu':'pd';
+  const L=dailyData[dailyData.length-1],up=L.chg>=0,c=up?'pu':'pd';
   $('cp').className='pr '+c;$('cp').textContent=L.close.toFixed(2);
   $('cc').className='cg '+c;$('cc').textContent=(up?'+':'')+L.chgA+'  '+(up?'+':'')+L.chg.toFixed(2)+'%';
   $('pi').style.display='flex';$('pd2').style.display='';
@@ -615,8 +623,8 @@ async function loadDetail(){
     const d3=await tryJsonp(['push2.eastmoney.com','push2his.eastmoney.com'], pathFn3, 'callback');
 
     const q=d3&&d3.data||{};
-    const L=fullData[fullData.length-1];
-    const prev=fullData.length>1?fullData[fullData.length-2]:L;
+    const L=dailyData[dailyData.length-1];
+    const prev=dailyData.length>1?dailyData[dailyData.length-2]:L;
     detail={
       open:(q.open||L.open).toFixed(2),
       preClose:(q.preClose||prev.close).toFixed(2),
@@ -646,9 +654,9 @@ async function loadDetail(){
     }
   }catch(e){
     console.warn('loadDetail部分失败:',e);
-    if(fullData&&fullData.length){
-      const L=fullData[fullData.length-1];
-      const prev=fullData.length>1?fullData[fullData.length-2]:L;
+    if(dailyData&&dailyData.length){
+      const L=dailyData[dailyData.length-1];
+      const prev=dailyData.length>1?dailyData[dailyData.length-2]:L;
       detail={
         open:L.open.toFixed(2),
         preClose:prev.close.toFixed(2),
@@ -669,7 +677,7 @@ async function loadDetail(){
   }
   renderTab();
 }
-function renderTab(){if(curTab==='wl'){renderWl();return;}if(!curStock||!detail){$('rpBody').innerHTML='<div class="info-empty">选择股票查看</div>';return;}if(curTab==='info')renderInfo();else renderInst();}
+function renderTab(){if(curTab==='wl'){renderWl();return;}if(curTab==='sim'){renderSim();return;}}
 function renderInfo(){const d=detail;$('rpBody').innerHTML=`<div class="info-sec"><div class="info-title">行情</div><div class="info-row"><span class="info-k">今开</span><span class="info-v">${d.open}</span></div><div class="info-row"><span class="info-k">昨收</span><span class="info-v">${d.preClose}</span></div><div class="info-row"><span class="info-k">最高</span><span class="info-v pu">${d.high}</span></div><div class="info-row"><span class="info-k">最低</span><span class="info-v pd">${d.low}</span></div><div class="info-row"><span class="info-k">成交量</span><span class="info-v">${d.vol}</span></div><div class="info-row"><span class="info-k">成交额</span><span class="info-v">${d.amt}</span></div><div class="info-row"><span class="info-k">振幅</span><span class="info-v">${d.amp}</span></div><div class="info-row"><span class="info-k">换手率</span><span class="info-v">${d.turn}</span></div><div class="info-title">估值</div><div class="info-row"><span class="info-k">总市值</span><span class="info-v">${d.cap}</span></div><div class="info-row"><span class="info-k">流通市值</span><span class="info-v">${d.circCap}</span></div><div class="info-row"><span class="info-k">市盈率PE</span><span class="info-v">${d.pe}</span></div><div class="info-row"><span class="info-k">市净率PB</span><span class="info-v">${d.pb}</span></div><div class="info-row"><span class="info-k">行业</span><span class="info-v">${d.industry}</span></div></div>`;}
 function renderInst(){const d=detail,total=d.buy+d.ow+d.hold+d.uw+d.sell;if(!total){$('rpBody').innerHTML='<div class="info-sec"><div class="info-title">机构评级</div><div style="padding:20px 0;text-align:center;color:var(--text3);font-size:12px">暂无数据</div></div>';return;}const bP=(d.buy/total*100).toFixed(0),oP=(d.ow/total*100).toFixed(0),hP=(d.hold/total*100).toFixed(0),dP=((d.uw+d.sell)/total*100).toFixed(0),bull=+bP+ +oP;let v='机构意见分歧，建议观望';if(bull>=70)v='机构普遍看好，多数建议买入或增持';else if(bull>=50)v='机构整体偏乐观，可关注';$('rpBody').innerHTML=`<div class="info-sec"><div class="info-title">机构评级 · ${total}家</div><div class="rat-bar">${d.buy?`<div style="width:${bP}%;background:#26a69a"></div>`:''}${d.ow?`<div style="width:${oP}%;background:#66bb6a"></div>`:''}${d.hold?`<div style="width:${hP}%;background:#ffa726"></div>`:''}${(d.uw+d.sell)?`<div style="width:${dP}%;background:#ef5350"></div>`:''}</div><div class="rat-leg"><span><span class="rat-dot" style="background:#26a69a"></span>买入 ${d.buy}</span><span><span class="rat-dot" style="background:#66bb6a"></span>增持 ${d.ow}</span><span><span class="rat-dot" style="background:#ffa726"></span>中性 ${d.hold}</span><span><span class="rat-dot" style="background:#ef5350"></span>减持 ${d.uw+d.sell}</span></div><div class="rat-sum">${v}<br>看好占比 <b>${bull}%</b>（${d.buy+d.ow}家）<br><span style="font-size:10px;color:var(--text3)">数据来源东方财富，仅供参考</span></div></div>`;}
 document.querySelector('.rp-tabs').addEventListener('click',e=>{const t=e.target.closest('.rp-tab');if(!t)return;document.querySelector('.rp-tab.act').classList.remove('act');t.classList.add('act');curTab=t.dataset.t;renderTab();});
@@ -686,6 +694,31 @@ function initChart(){
   savedZoom=null;
 }
 
+function getTradeMarkers(dataLen){
+  if(!simAccount||!simAccount.history.length||!curStock||!fullData.length)return[];
+  // 构建日期范围索引: 对于聚合K线，交易日期落在(prevDate, curDate]范围内即匹配
+  // 对于日K，退化为精确匹配
+  // Popover speech-bubble paths (arrow points toward the candle)
+  const buyPath='path://M-6,0L-2,0L0,-3L2,0L6,0Q8,0,8,2L8,9Q8,11,6,11L-6,11Q-8,11,-8,9L-8,2Q-8,0,-6,0Z';
+  const sellPath='path://M-6,0L-2,0L0,3L2,0L6,0Q8,0,8,-2L8,-9Q8,-11,6,-11L-6,-11Q-8,-11,-8,-9L-8,-2Q-8,0,-6,0Z';
+  const markers=[];
+  simAccount.history.forEach(t=>{
+    if(t.code!==curStock.code)return;
+    // 范围匹配: 找到第一个date>=t.date的K线
+    let idx=-1;
+    for(let i=0;i<dataLen;i++){
+      if(fullData[i].date>=t.date){idx=i;break;}
+    }
+    if(idx<0)return;
+    const d=fullData[idx];
+    if(t.direction==='buy'){
+      markers.push({coord:[idx,d.low],symbol:buyPath,symbolSize:[20,16],symbolOffset:[0,12],itemStyle:{color:'#26a69a',shadowColor:'rgba(0,0,0,.12)',shadowBlur:3,shadowOffsetY:1},label:{show:true,position:'inside',formatter:'B',fontSize:9,fontWeight:'bold',color:'#fff',offset:[0,2]}});
+    }else{
+      markers.push({coord:[idx,d.high],symbol:sellPath,symbolSize:[20,16],symbolOffset:[0,-12],itemStyle:{color:'#ef5350',shadowColor:'rgba(0,0,0,.12)',shadowBlur:3,shadowOffsetY:-1},label:{show:true,position:'inside',formatter:'S',fontSize:9,fontWeight:'bold',color:'#fff',offset:[0,-2]}});
+    }
+  });
+  return markers;
+}
 function renderC(dataLen,resetView){
   if(!chart||!fullData.length)return;
   buildPad(dataLen);
@@ -716,13 +749,7 @@ function renderC(dataLen,resetView){
 
   const opt={
     backgroundColor:'#fff',animation:false,
-    legend:{
-      data:['MA5','MA10','MA20','MA60'],
-      top:6,left:'center',
-      itemWidth:16,itemHeight:10,
-      textStyle:{color:'#787b86',fontSize:11},
-      inactiveColor:'#e0e3eb'
-    },
+    legend:{show:false},
     tooltip:{
       trigger:'axis',
       axisPointer:{type:'cross',crossStyle:{color:'#787b86',width:1},lineStyle:{color:'#787b86',width:1,type:'dashed'}},
@@ -746,15 +773,15 @@ function renderC(dataLen,resetView){
           `<span style="color:#787b86">收盘</span><span style="color:${c};font-weight:500">${d.close.toFixed(2)}</span>`+
           `<span style="color:#787b86">涨跌</span><span style="color:${c};font-weight:500">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span>`+
           `<span style="color:#787b86">成交量</span><span style="font-weight:500">${fV(d.vol)}</span>`+
-          `<span style="color:#f5a623">MA5</span><span style="font-weight:500">${ma5Val?ma5Val.toFixed(2):'-'}</span>`+
-          `<span style="color:#4fc3f7">MA10</span><span style="font-weight:500">${ma10Val?ma10Val.toFixed(2):'-'}</span>`+
-          `<span style="color:#ce93d8">MA20</span><span style="font-weight:500">${ma20Val?ma20Val.toFixed(2):'-'}</span>`+
-          `<span style="color:#81c784">MA60</span><span style="font-weight:500">${ma60Val?ma60Val.toFixed(2):'-'}</span>`+
+          `<span style="color:#f5a623">MA5</span><span style="font-weight:500">${ma5Val?ma5Val.toFixed(3):'-'}</span>`+
+          `<span style="color:#4fc3f7">MA10</span><span style="font-weight:500">${ma10Val?ma10Val.toFixed(3):'-'}</span>`+
+          `<span style="color:#ce93d8">MA20</span><span style="font-weight:500">${ma20Val?ma20Val.toFixed(3):'-'}</span>`+
+          `<span style="color:#81c784">MA60</span><span style="font-weight:500">${ma60Val?ma60Val.toFixed(3):'-'}</span>`+
           `<span style="color:#787b86">换手率</span><span style="font-weight:500">${d.turn}%</span></div>`;
       }
     },
     axisPointer:{link:[{xAxisIndex:'all'}],label:{backgroundColor:'#505862',color:'#fff',fontSize:10,padding:[3,6]}},
-    grid:[{left:10,right:56,top:50,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
+    grid:[{left:10,right:56,top:30,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
     xAxis:[
       {type:'category',data:pd.dates,gridIndex:0,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{color:'#787b86',fontSize:10},splitLine:{show:true,lineStyle:{color:'rgba(224,227,235,.35)'}},boundaryGap:true,axisPointer:{label:{show:true},snap:true}},
       {type:'category',data:pd.dates,gridIndex:1,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{show:false},splitLine:{show:false},boundaryGap:true,axisPointer:{label:{show:false}}}
@@ -774,11 +801,12 @@ function renderC(dataLen,resetView){
     ]
   };
   if(!rpMode&&dataLen>0){const last=fullData[dataLen-1],up=last.chg>=0;opt.series[0].markLine={silent:true,symbol:'none',lineStyle:{color:up?'#ef5350':'#26a69a',type:'dashed',width:1,opacity:.5},label:{position:'end',formatter:last.close.toFixed(2),color:'#fff',backgroundColor:up?'#ef5350':'#26a69a',padding:[2,6],borderRadius:2,fontSize:10},data:[{yAxis:last.close}]};}
+  const tm=getTradeMarkers(dataLen);if(tm.length)opt.series[0].markPoint={data:tm,animation:false};
   chart.setOption(opt,true);
   if(!resetView&&savedZoom){chart.dispatchAction({type:'dataZoom',start:zS,end:zE});}
 }
 
-function maC(d,n,len){const r=[];for(let i=0;i<len;i++){if(i<n-1){r.push(null);continue;}let s=0;for(let j=0;j<n;j++)s+=d[i-j].close;r.push(+(s/n).toFixed(2));}return r;}
+function maC(d,n,len){const r=[];for(let i=0;i<len;i++){if(i<n-1){r.push(null);continue;}let s=0;for(let j=0;j<n;j++)s+=d[i-j].close;r.push(+(s/n).toFixed(3));}return r;}
 
 function onMM(p){
   if(!fullData.length)return;
@@ -791,23 +819,17 @@ function updOHLC(d){
   const pn=curKlt==='101'?'日K':curKlt==='102'?'周K':'月K';
   $('ohlc').innerHTML=`<span class="ot">${curStock?curStock.name:''} ${pn}</span><span><span class="ol">开 </span><span class="ov" style="color:${c}">${d.open.toFixed(2)}</span></span><span><span class="ol">高 </span><span class="ov" style="color:${c}">${d.high.toFixed(2)}</span></span><span><span class="ol">低 </span><span class="ov" style="color:${c}">${d.low.toFixed(2)}</span></span><span><span class="ol">收 </span><span class="ov" style="color:${c}">${d.close.toFixed(2)}</span></span><span><span class="ov" style="color:${c}">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span></span><span><span class="ol">量 </span><span class="ov" style="color:var(--text2)">${fV(d.vol)}</span></span>`;
 }
-function onDbl(p){if(!fullData.length)return;const i=p.dataIndex;if(i==null||i<0||i>=fullData.length)return;const z=chart.getOption().dataZoom[0];savedZoom={start:z.start,end:z.end};enterRp(i+1);toast('从 '+fullData[i].date+' 开始回放');}
+function onDbl(p){if(!fullData.length)return;const i=p.dataIndex;if(i==null||i<0||i>=fullData.length)return;const z=chart.getOption().dataZoom[0];savedZoom={start:z.start,end:z.end};const clickDate=fullData[i].date;const dailyIdx=findDailyDateIdx(clickDate)+1;enterRp(dailyIdx);toast('从 '+fullData[i].date+' 开始回放');}
 
 // ===== Replay =====
 function setRpBtns(v){$('bPl').disabled=!v;$('bPv').disabled=!v;$('bNx').disabled=!v;$('prg').disabled=!v;$('spd').disabled=!v;}
-function enterRp(si){
+function enterRp(dailyIdx){
   rpMode=true;$('rpTgl').classList.add('on');$('rpBdg').classList.add('show');setRpBtns(true);
-  visibleLen=si||Math.min(60,fullData.length);
-  if(visibleLen>fullData.length)visibleLen=fullData.length;
-  // 初始化dailyVisibleLen：找到当前日期对应的日线位置
-  if(fullData.length && cachedDailyData.length){
-    const currentDate=fullData[visibleLen-1].date;
-    const dailyIdx=findClosestDateIndex(currentDate, cachedDailyData);
-    dailyVisibleLen=dailyIdx+1;
-  }else{
-    dailyVisibleLen=visibleLen;
-  }
-  updPrg();
+  if(dailyIdx!=null)dailyVisibleLen=dailyIdx;
+  if(dailyVisibleLen<1)dailyVisibleLen=Math.min(60,dailyData.length);
+  if(dailyVisibleLen>dailyData.length)dailyVisibleLen=dailyData.length;
+  fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;
+  buildPad(visibleLen);updPrg();
   if(!savedZoom){
     const totalLen=visibleLen+PAD_RIGHT;
     const vis=Math.min(100,visibleLen);
@@ -817,24 +839,25 @@ function enterRp(si){
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
 }
 function exitRp(){stopP();rpMode=false;$('rpTgl').classList.remove('on');$('rpBdg').classList.remove('show');setRpBtns(false);}
-function showAll(){exitRp();visibleLen=fullData.length;savedZoom=null;renderC(fullData.length,true);if(fullData.length)updOHLC(fullData[fullData.length-1]);updPrg();}
+function showAll(){exitRp();dailyVisibleLen=dailyData.length;fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;buildPad(visibleLen);savedZoom=null;renderC(visibleLen,true);if(visibleLen>0)updOHLC(fullData[visibleLen-1]);updPrg();}
 function stepF(){
-  if(visibleLen>=fullData.length){stopP();return;}
-  // 更新visibleLen（当前周期索引）
-  visibleLen++;
-  // 更新dailyVisibleLen（日线索引）
+  if(dailyVisibleLen>=dailyData.length){stopP();return;}
   if(curKlt==='101'){
-    // 日线模式，同步增加
-    dailyVisibleLen=visibleLen;
+    dailyVisibleLen++;
   }else{
-    // 周/月线模式：找到下一根K线的最后一个交易日在日线中的位置
-    if(visibleLen<=fullData.length && cachedDailyData.length){
-      const nextDate=fullData[visibleLen-1].date;
-      const dailyIdx=findClosestDateIndex(nextDate, cachedDailyData);
-      dailyVisibleLen=dailyIdx+1;
+    // 周K/月K: 步进一个完整周期
+    const keyFn=curKlt==='102'?getISOWeekKey:getMonthKey;
+    const curKey=keyFn(dailyData[dailyVisibleLen-1].date);
+    // 先走完当前周期剩余的天
+    while(dailyVisibleLen<dailyData.length&&keyFn(dailyData[dailyVisibleLen].date)===curKey)dailyVisibleLen++;
+    // 再包含下一个完整周期
+    if(dailyVisibleLen<dailyData.length){
+      const nextKey=keyFn(dailyData[dailyVisibleLen].date);
+      while(dailyVisibleLen<dailyData.length&&keyFn(dailyData[dailyVisibleLen].date)===nextKey)dailyVisibleLen++;
     }
   }
-  updPrg();
+  fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;
+  buildPad(visibleLen);updPrg();
   // 智能滚动: 检查最新K线是否快到视口右边缘
   if(savedZoom){
     const totalLen=visibleLen+PAD_RIGHT;
@@ -849,31 +872,28 @@ function stepF(){
   }
   renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
+  if(!playing&&curTab==='sim')renderSim();
 }
 function stepB(){
-  if(visibleLen<=1)return;
-  // 更新visibleLen（当前周期索引）
-  visibleLen--;
-  // 更新dailyVisibleLen（日线索引）
+  if(dailyVisibleLen<=1)return;
   if(curKlt==='101'){
-    // 日线模式，同步减少
-    dailyVisibleLen=visibleLen;
+    dailyVisibleLen--;
   }else{
-    // 周/月线模式：找到前一根K线的最后一个交易日在日线中的位置
-    if(visibleLen>=1 && cachedDailyData.length){
-      const prevDate=fullData[visibleLen-1].date;
-      const dailyIdx=findClosestDateIndex(prevDate, cachedDailyData);
-      dailyVisibleLen=dailyIdx+1;
-    }
+    // 周K/月K: 回退一个完整周期
+    const keyFn=curKlt==='102'?getISOWeekKey:getMonthKey;
+    const curKey=keyFn(dailyData[dailyVisibleLen-1].date);
+    // 移除当前周期的所有天
+    while(dailyVisibleLen>1&&keyFn(dailyData[dailyVisibleLen-1].date)===curKey)dailyVisibleLen--;
   }
-  updPrg();
-  renderC(visibleLen,false);
+  fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;
+  buildPad(visibleLen);updPrg();renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
+  if(!playing&&curTab==='sim')renderSim();
 }
-function startP(){if(!rpMode)return;if(visibleLen>=fullData.length)enterRp(Math.min(60,fullData.length));playing=true;$('bPl').classList.add('playing');$('plIc').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';tick();}
+function startP(){if(!rpMode)return;if(dailyVisibleLen>=dailyData.length)enterRp(Math.min(60,dailyData.length));playing=true;$('bPl').classList.add('playing');$('plIc').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';tick();}
 function stopP(){playing=false;clearTimeout(playTm);$('bPl').classList.remove('playing');$('plIc').innerHTML='<path d="M8 5v14l11-7z"/>';}
-function tick(){if(!playing)return;stepF();if(visibleLen<fullData.length)playTm=setTimeout(tick,playSpd);else{stopP();toast('回放完成');}}
-function updPrg(){const t=fullData.length;$('prg').max=t;$('prg').value=visibleLen;if(rpMode&&t){const d=fullData[Math.min(visibleLen,t)-1];$('pLbl').textContent=(d?d.date:'')+' · '+visibleLen+'/'+t;}else $('pLbl').textContent=t?'共 '+t+' 根K线':'就绪';}
+function tick(){if(!playing)return;stepF();if(dailyVisibleLen<dailyData.length)playTm=setTimeout(tick,playSpd);else{stopP();if(curTab==='sim')renderSim();toast('回放完成');}}
+function updPrg(){const t=dailyData.length;$('prg').max=t;$('prg').value=dailyVisibleLen;if(rpMode&&t){const d=dailyData[Math.min(dailyVisibleLen,t)-1];$('pLbl').textContent=(d?d.date:'')+' · '+dailyVisibleLen+'/'+t;}else $('pLbl').textContent=t?'共 '+t+' 根日K线':'就绪';}
 
 // ===== Watchlist (grouped) =====
 function renderWl(){
@@ -932,12 +952,12 @@ function bindWlAll(){
   });
 }
 function hlWl(){if(curTab==='wl')renderWl();}
-function addWl(){if(!curStock){toast('请先搜索股票');return;}const grp=wlGroups[activeWlGroup]||(wlGroups[activeWlGroup]=[]);if(grp.some(s=>s.code===curStock.code)){toast('已在该分组中');return;}const L=fullData.length?fullData[fullData.length-1]:null;grp.push({code:curStock.code,name:curStock.name,secid:curStock.secid,mkt:curStock.mkt,lp:L?L.close:null,chg:L?L.chg:null});saveWl();if(curTab==='wl')renderWl();toast(curStock.name+' 已加入 '+activeWlGroup);}
+function addWl(){if(!curStock){toast('请先搜索股票');return;}const grp=wlGroups[activeWlGroup]||(wlGroups[activeWlGroup]=[]);if(grp.some(s=>s.code===curStock.code)){toast('已在该分组中');return;}const L=dailyData.length?dailyData[dailyData.length-1]:null;grp.push({code:curStock.code,name:curStock.name,secid:curStock.secid,mkt:curStock.mkt,lp:L?L.close:null,chg:L?L.chg:null});saveWl();if(curTab==='wl')renderWl();toast(curStock.name+' 已加入 '+activeWlGroup);}
 function rmWl(code){const grp=wlGroups[activeWlGroup];if(grp)wlGroups[activeWlGroup]=grp.filter(s=>s.code!==code);saveWl();if(curTab==='wl')renderWl();updFavBtn();}
 // ===== Favorite Toggle =====
 function isInWl(){if(!curStock)return false;return(wlGroups[activeWlGroup]||[]).some(s=>s.code===curStock.code);}
 function updFavBtn(){const btn=$('bFav'),td=$('favTd'),ic=$('favIc');if(!btn||!td)return;if(!curStock){btn.style.display='none';td.style.display='none';return;}btn.style.display='';td.style.display='';const inWl=isInWl();btn.classList.toggle('faved',inWl);btn.title=inWl?'取消收藏':'收藏到 '+activeWlGroup;if(ic)ic.setAttribute('d',inWl?'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z':'M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z');}
-function toggleFav(){if(!curStock){toast('请先搜索股票');return;}const grp=wlGroups[activeWlGroup]||(wlGroups[activeWlGroup]=[]);const idx=grp.findIndex(s=>s.code===curStock.code);if(idx>=0){grp.splice(idx,1);toast(curStock.name+' 已取消收藏');}else{const L=fullData.length?fullData[fullData.length-1]:null;grp.push({code:curStock.code,name:curStock.name,secid:curStock.secid,mkt:curStock.mkt,lp:L?L.close:null,chg:L?L.chg:null});toast(curStock.name+' 已加入 '+activeWlGroup);}saveWl();updFavBtn();if(curTab==='wl')renderWl();}
+function toggleFav(){if(!curStock){toast('请先搜索股票');return;}const grp=wlGroups[activeWlGroup]||(wlGroups[activeWlGroup]=[]);const idx=grp.findIndex(s=>s.code===curStock.code);if(idx>=0){grp.splice(idx,1);toast(curStock.name+' 已取消收藏');}else{const L=dailyData.length?dailyData[dailyData.length-1]:null;grp.push({code:curStock.code,name:curStock.name,secid:curStock.secid,mkt:curStock.mkt,lp:L?L.close:null,chg:L?L.chg:null});toast(curStock.name+' 已加入 '+activeWlGroup);}saveWl();updFavBtn();if(curTab==='wl')renderWl();}
 async function refWl(){
   const grp=wlGroups[activeWlGroup]||[];
   for(const s of grp){
@@ -978,99 +998,41 @@ async function refWl(){
 
 // ===== Events =====
 $('rpTgl').addEventListener('click',()=>{
-  if(!fullData.length){toast('请先加载股票');return;}
+  if(!dailyData.length){toast('请先加载股票');return;}
   if(rpMode){showAll();toast('已退出回放');}
   else{
-    let si=fullData.length;
-    if(chart&&savedZoom){const endPct=savedZoom.end/100;const totalLen=fullData.length+PAD_RIGHT;si=Math.min(fullData.length,Math.round(endPct*totalLen));}
-    si=Math.max(20,Math.min(si,fullData.length));
-    enterRp(si);toast('双击K线可选择起点 · 空格键播放');
+    let dailyIdx=dailyData.length;
+    if(chart&&savedZoom){
+      const endPct=savedZoom.end/100;const totalLen=fullData.length+PAD_RIGHT;
+      const viewIdx=Math.min(fullData.length,Math.round(endPct*totalLen));
+      if(viewIdx>0&&viewIdx<=fullData.length){
+        const viewDate=fullData[Math.min(viewIdx,fullData.length)-1].date;
+        dailyIdx=findDailyDateIdx(viewDate)+1;
+      }
+    }
+    dailyIdx=Math.max(20,Math.min(dailyIdx,dailyData.length));
+    enterRp(dailyIdx);toast('双击K线可选择起点 · 空格键播放');
   }
 });
-$('bPl').addEventListener('click',()=>{if(!rpMode||!fullData.length)return;playing?stopP():startP();});
+$('bPl').addEventListener('click',()=>{if(!rpMode||!dailyData.length)return;playing?stopP():startP();});
 $('bPv').addEventListener('click',()=>{if(rpMode){stopP();stepB();}});
 $('bNx').addEventListener('click',()=>{if(rpMode){stopP();stepF();}});
-$('prg').addEventListener('input',()=>{if(!rpMode)return;stopP();visibleLen=+$('prg').value;if(visibleLen<1)visibleLen=1;
-  // 拖动滑块时也要更新dailyVisibleLen
-  if(curKlt==='101'){
-    dailyVisibleLen=visibleLen;
-  }else if(fullData.length && cachedDailyData.length){
-    const currDate=fullData[visibleLen-1].date;
-    const dailyIdx=findClosestDateIndex(currDate, cachedDailyData);
-    dailyVisibleLen=dailyIdx+1;
-  }
-  renderC(visibleLen,false);updPrg();if(visibleLen>0)updOHLC(fullData[visibleLen-1]);});
+$('prg').addEventListener('input',()=>{if(!rpMode)return;stopP();dailyVisibleLen=+$('prg').value;if(dailyVisibleLen<1)dailyVisibleLen=1;if(dailyVisibleLen>dailyData.length)dailyVisibleLen=dailyData.length;fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;buildPad(visibleLen);renderC(visibleLen,false);updPrg();if(visibleLen>0)updOHLC(fullData[visibleLen-1]);if(curTab==='sim')renderSim();});
 $('spd').addEventListener('change',()=>{playSpd=+$('spd').value;});
-$('pg').addEventListener('click',e=>{const b=e.target.closest('.per');if(!b)return;$('pg').querySelector('.act').classList.remove('act');b.classList.add('act');const newKlt=b.dataset.k;
-  // 如果有日线缓存，直接无刷新切换（任何周期之间都可以）
-  if(curStock && cachedDailyData.length>0){
-    try{
-      // 第一步：确定目标日线位置（targetDailyVisibleLen）
-      let targetDailyVisibleLen=dailyVisibleLen;
-      let currentDate=null;
-
-      // 先获取当前显示的日期，不管在哪个周期
-      if(fullData.length){
-        const currIdx=rpMode?Math.min(visibleLen-1,fullData.length-1):(fullData.length-1);
-        if(currIdx>=0 && currIdx<fullData.length){
-          currentDate=fullData[currIdx].date;
-          // 如果还没有dailyVisibleLen，初始化它
-          if(!dailyVisibleLen || dailyVisibleLen<=0){
-            const dailyIdx=findClosestDateIndex(currentDate, cachedDailyData);
-            targetDailyVisibleLen=dailyIdx+1;
-          }else{
-            targetDailyVisibleLen=dailyVisibleLen;
-          }
-        }
-      }
-
-      // 更新curKlt和dailyVisibleLen
-      curKlt=newKlt;
-      dailyVisibleLen=targetDailyVisibleLen;
-
-      // 第二步：合成新周期数据（始终用完整数据，这样才能点击下一根）
-      let fullPeriodData=[];
-      if(newKlt==='101'){
-        fullPeriodData=cachedDailyData.slice();
-      }else if(newKlt==='102'){
-        fullPeriodData=synthesizeWeeklyFromDaily(cachedDailyData);
-      }else if(newKlt==='103'){
-        fullPeriodData=synthesizeMonthlyFromDaily(cachedDailyData);
-      }
-      fullData=fullPeriodData;
-
-      // 第三步：根据当前日线位置，找到新周期中对应的visibleLen
-      if(currentDate && fullData.length){
-        const newIdx=findClosestDateIndex(currentDate, fullData);
-        visibleLen=newIdx+1;
-      }else{
-        visibleLen=fullData.length;
-      }
-
-      // 重新渲染
-      buildPad(fullData.length);
-      savedZoom=null;
-      if(rpMode){
-        renderC(visibleLen,true);
-        if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
-      }else{
-        renderC(fullData.length,true);
-        if(fullData.length)updOHLC(fullData[fullData.length-1]);
-      }
-      updSym();
-      updPrg();
-      console.log('无刷新切换周期成功:', newKlt==='101'?'日线':newKlt==='102'?'周线':'月线', '日期:', currentDate, '日线索引:', dailyVisibleLen, '周期索引:', visibleLen);
-      return;
-    }catch(err){
-      console.warn('无刷新切换失败，回退到正常加载:', err);
-      // 出错时确保curKlt也更新
-      curKlt=newKlt;
-    }
-  }
-  // 回退到原来的加载方式
-  curKlt=newKlt;if(curStock)loadK();
+$('pg').addEventListener('click',e=>{
+  const b=e.target.closest('.per');if(!b)return;
+  const newKlt=b.dataset.k;if(newKlt===curKlt)return;
+  $('pg').querySelector('.act').classList.remove('act');b.classList.add('act');
+  const zoomRange=getZoomDateRange();
+  curKlt=newKlt;stopP();
+  if(!dailyData.length)return;
+  fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;
+  buildPad(visibleLen);
+  if(zoomRange)restoreZoomByDate(zoomRange);else savedZoom=null;
+  renderC(visibleLen,!zoomRange);
+  if(visibleLen>0)updOHLC(fullData[visibleLen-1]);updPrg();
 });
-$('bLt').addEventListener('click',()=>{if(!fullData.length)return;if(rpMode){showAll();toast('已退出回放');}else{savedZoom=null;renderC(fullData.length,true);toast('已跳到最新');}});
+$('bLt').addEventListener('click',()=>{if(!dailyData.length)return;if(rpMode){showAll();toast('已退出回放');}else{savedZoom=null;renderC(fullData.length,true);toast('已跳到最新');}});
 $('bRp').addEventListener('click',()=>{$('rightPanel').classList.toggle('collapsed');$('resizeH').style.display=$('rightPanel').classList.contains('collapsed')?'none':'';setTimeout(()=>chart&&chart.resize(),10);});
 $('bFs').addEventListener('click',tFs);
 $('bFav').addEventListener('click',toggleFav);
@@ -1080,7 +1042,7 @@ document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   switch(e.key){
     case'/':e.preventDefault();openS();break;
-    case' ':e.preventDefault();if(rpMode&&fullData.length)playing?stopP():startP();break;
+    case' ':e.preventDefault();if(rpMode&&dailyData.length)playing?stopP():startP();break;
     case'ArrowLeft':e.preventDefault();if(rpMode){stopP();stepB();}break;
     case'ArrowRight':e.preventDefault();if(rpMode){stopP();stepF();}break;
     case'Escape':if(rpMode){showAll();toast('已退出回放');}break;
@@ -1088,8 +1050,158 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+// ===== Simulation Account =====
+function loadSim(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('simAccount2'));
+    if(saved&&saved.cash!=null){simAccount=saved;simIdCounter=saved.idCounter||0;}
+    else resetSim(true);
+  }catch(e){resetSim(true);}
+}
+function saveSim(){simAccount.idCounter=simIdCounter;localStorage.setItem('simAccount2',JSON.stringify(simAccount));}
+function resetSim(silent){
+  simAccount={cash:SIM_INITIAL,positions:[],history:[]};simIdCounter=0;saveSim();
+  if(!silent){toast('账户已重置');if(curTab==='sim')renderSim();}
+  if(chart&&fullData.length){renderC(visibleLen,false);}
+}
+function getSimPrice(){
+  if(!curStock||!dailyData.length)return null;
+  const idx=rpMode?Math.min(dailyVisibleLen,dailyData.length)-1:dailyData.length-1;
+  return dailyData[idx];
+}
+function simBuy(shares){
+  if(!curStock||!dailyData.length){toast('请先加载股票');return;}
+  const d=getSimPrice();if(!d)return;
+  const cost=d.close*shares;
+  if(cost>simAccount.cash){toast('资金不足 (需'+cost.toFixed(2)+', 可用'+simAccount.cash.toFixed(2)+')');return;}
+  simAccount.cash-=cost;
+  simAccount.positions.push({id:++simIdCounter,code:curStock.code,name:curStock.name,secid:curStock.secid,shares:shares,buyPrice:d.close,buyDate:d.date});
+  simAccount.history.push({id:++simIdCounter,code:curStock.code,name:curStock.name,direction:'buy',shares:shares,price:d.close,date:d.date,pnl:null,pnlPct:null});
+  saveSim();toast('买入 '+curStock.name+' '+shares+'股 @'+d.close.toFixed(2));
+  if(chart&&fullData.length){renderC(visibleLen,false);}
+  if(curTab==='sim')renderSim();
+}
+function simSell(posId){
+  if(!curStock||!dailyData.length)return;
+  const d=getSimPrice();if(!d)return;
+  const idx=simAccount.positions.findIndex(p=>p.id===posId);if(idx<0)return;
+  const pos=simAccount.positions[idx];
+  const revenue=d.close*pos.shares;
+  const pnl=revenue-pos.buyPrice*pos.shares;
+  const pnlPct=(d.close-pos.buyPrice)/pos.buyPrice*100;
+  simAccount.cash+=revenue;
+  simAccount.positions.splice(idx,1);
+  simAccount.history.push({id:++simIdCounter,code:pos.code,name:pos.name,direction:'sell',shares:pos.shares,price:d.close,date:d.date,buyPrice:pos.buyPrice,pnl:pnl,pnlPct:pnlPct});
+  saveSim();
+  const sign=pnl>=0?'+':'';
+  toast('卖出 '+pos.name+' '+pos.shares+'股 @'+d.close.toFixed(2)+' '+sign+pnl.toFixed(2));
+  if(chart&&fullData.length){renderC(visibleLen,false);}
+  if(curTab==='sim')renderSim();
+}
+function simSellAll(){
+  if(!curStock||!dailyData.length)return;
+  const cur=simAccount.positions.filter(p=>p.code===curStock.code);
+  if(!cur.length){toast('无持仓可卖出');return;}
+  cur.forEach(p=>simSell(p.id));
+}
+function renderSim(){
+  const body=$('rpBody');
+  if(!simAccount){body.innerHTML='<div class="sim-no-stock">加载中...</div>';return;}
+  const d=getSimPrice();
+  const curPrice=d?d.close:null;
+  // 计算持仓市值
+  let posValue=0;
+  simAccount.positions.forEach(p=>{
+    if(curStock&&p.code===curStock.code&&curPrice)posValue+=curPrice*p.shares;
+    else posValue+=p.buyPrice*p.shares;
+  });
+  const totalAssets=simAccount.cash+posValue;
+  const totalPnl=totalAssets-SIM_INITIAL;
+  const totalPnlPct=totalPnl/SIM_INITIAL*100;
+  const pc=totalPnl>=0?'pu':'pd';
+  const ps=totalPnl>=0?'+':'';
+  let html='<div class="sim-panel">';
+  // 账户概览
+  html+='<div class="sim-summary">';
+  html+='<div class="sim-total"><span class="sim-total-label">总资产</span><span class="sim-total-value '+pc+'">'+totalAssets.toFixed(2)+'</span></div>';
+  html+='<div class="sim-row"><span class="sim-k">初始资金</span><span class="sim-v">'+SIM_INITIAL.toFixed(2)+'</span></div>';
+  html+='<div class="sim-row"><span class="sim-k">可用资金</span><span class="sim-v">'+simAccount.cash.toFixed(2)+'</span></div>';
+  html+='<div class="sim-row"><span class="sim-k">持仓市值</span><span class="sim-v">'+posValue.toFixed(2)+'</span></div>';
+  html+='<div class="sim-row"><span class="sim-k">总盈亏</span><span class="sim-v '+pc+'">'+ps+totalPnl.toFixed(2)+' ('+ps+totalPnlPct.toFixed(2)+'%)</span></div>';
+  html+='</div>';
+  // 当前持仓
+  const positions=simAccount.positions;
+  html+='<div class="sim-section"><div class="sim-title">持仓 · '+positions.length+'笔</div>';
+  if(!positions.length){html+='<div class="sim-empty">暂无持仓</div>';}
+  else{
+    positions.forEach(p=>{
+      let cp=p.buyPrice,unrealPnl=0,unrealPct=0,hasLive=false;
+      if(curStock&&p.code===curStock.code&&curPrice){cp=curPrice;unrealPnl=(curPrice-p.buyPrice)*p.shares;unrealPct=(curPrice-p.buyPrice)/p.buyPrice*100;hasLive=true;}
+      const uc=unrealPnl>=0?'pu':'pd';const us=unrealPnl>=0?'+':'';
+      html+='<div class="sim-pos-item">';
+      html+='<div class="sim-pos-hdr"><span class="sim-pos-name">'+p.name+'</span><span class="sim-pos-code">'+p.code+'</span></div>';
+      html+='<div class="sim-pos-info">';
+      html+='<div class="sim-pos-row"><span>数量</span><span>'+p.shares+'股</span></div>';
+      html+='<div class="sim-pos-row"><span>成本</span><span>'+p.buyPrice.toFixed(2)+'</span></div>';
+      html+='<div class="sim-pos-row"><span>买入日</span><span>'+p.buyDate+'</span></div>';
+      if(hasLive){
+        html+='<div class="sim-pos-row"><span>现价</span><span class="'+uc+'">'+curPrice.toFixed(2)+'</span></div>';
+        html+='<div class="sim-pos-row"><span>盈亏</span><span class="'+uc+'">'+us+unrealPnl.toFixed(2)+'</span></div>';
+        html+='<div class="sim-pos-row"><span>涨跌</span><span class="'+uc+'">'+us+unrealPct.toFixed(2)+'%</span></div>';
+      }
+      html+='</div>';
+      if(curStock&&p.code===curStock.code)html+='<button class="sim-sell-btn" data-pid="'+p.id+'">卖出</button>';
+      html+='</div>';
+    });
+  }
+  html+='</div>';
+  // 交易操作
+  if(curStock&&dailyData.length){
+    html+='<div class="sim-section sim-actions"><div class="sim-title">交易 · '+curStock.name+'</div>';
+    html+='<div class="sim-action-info"><span>'+(d?d.date:'')+'</span><span class="sim-cur-price">'+(curPrice?curPrice.toFixed(2):'--')+'</span></div>';
+    html+='<div class="sim-action-row">';
+    html+='<select class="sim-qty-sel" id="simQty"><option value="100">100股</option><option value="300">300股</option><option value="500">500股</option><option value="1000">1000股</option><option value="2000">2000股</option></select>';
+    html+='<button class="sim-buy-btn" id="simBuyBtn">买入</button>';
+    const curPos=positions.filter(p=>p.code===curStock.code);
+    if(curPos.length)html+='<button class="sim-sellall-btn" id="simSellAllBtn">清仓</button>';
+    html+='</div></div>';
+  }else{
+    html+='<div class="sim-section"><div class="sim-title">交易操作</div><div class="sim-no-stock">请先搜索并加载股票</div></div>';
+  }
+  // 交易记录
+  const hist=[...simAccount.history].reverse();
+  html+='<div class="sim-section"><div class="sim-title">交易记录 · '+hist.length+'笔</div>';
+  if(!hist.length){html+='<div class="sim-empty">暂无记录</div>';}
+  else{
+    hist.slice(0,50).forEach(t=>{
+      const isBuy=t.direction==='buy';
+      const dirClass=isBuy?'sim-dir-buy':'sim-dir-sell';
+      const dirText=isBuy?'买入':'卖出';
+      html+='<div class="sim-trade-item">';
+      html+='<div class="sim-trade-hdr"><span class="sim-trade-date">'+t.date+'</span><span class="'+dirClass+'">'+dirText+'</span></div>';
+      html+='<div class="sim-trade-body"><span class="sim-trade-name">'+t.name+'</span><span>'+t.shares+'股 @'+t.price.toFixed(2)+'</span></div>';
+      if(!isBuy&&t.pnl!=null){
+        const tc=t.pnl>=0?'pu':'pd';const ts2=t.pnl>=0?'+':'';
+        html+='<div class="sim-trade-pnl '+tc+'">'+ts2+t.pnl.toFixed(2)+' ('+ts2+t.pnlPct.toFixed(2)+'%)</div>';
+      }
+      html+='</div>';
+    });
+    if(hist.length>50)html+='<div class="sim-empty">仅显示最近50条</div>';
+  }
+  html+='</div>';
+  // 重置
+  html+='<div class="sim-reset"><button class="sim-reset-btn" id="simResetBtn">重置账户</button></div>';
+  html+='</div>';
+  body.innerHTML=html;
+  // 绑定事件
+  body.querySelectorAll('.sim-sell-btn').forEach(btn=>{btn.addEventListener('click',()=>simSell(+btn.dataset.pid));});
+  const buyBtn=$('simBuyBtn');if(buyBtn)buyBtn.addEventListener('click',()=>simBuy(+$('simQty').value));
+  const sellAllBtn=$('simSellAllBtn');if(sellAllBtn)sellAllBtn.addEventListener('click',()=>{if(confirm('确定清仓 '+curStock.name+' 所有持仓？'))simSellAll();});
+  const resetBtn=$('simResetBtn');if(resetBtn)resetBtn.addEventListener('click',()=>{if(confirm('确定重置模拟账户？所有持仓和记录将清空。'))resetSim();});
+}
+
 // ===== Init =====
-loadSt();renderTab();refWl();
+loadSt();loadSim();renderTab();refWl();
 })();
 </script>
 </body>
