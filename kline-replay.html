@@ -197,6 +197,11 @@ let curStock=null, curKlt='101', sTm=null, rpMode=false;
 let wlGroups={}, wlGroupNames=[], activeWlGroup='自选股';
 let recent=[], sFocIdx=-1, detail=null, curTab='wl';
 let savedZoom=null;
+// ===== 周期数据缓存（新增）=====
+let cachedDailyData=[]; // 缓存的日线数据
+let periodDataCache={}; // 各周期数据缓存: {'101': [...], '102': [...], '103': [...]}
+let switchPeriodWithoutReload=false; // 是否启用无刷新切换
+let dailyVisibleLen=0; // 专门记录日线索引，回放模式下保持不变
 
 const $=id=>document.getElementById(id);
 
@@ -218,6 +223,124 @@ function fA(v){if(v>=1e8)return(v/1e8).toFixed(2)+'亿';if(v>=1e4)return(v/1e4).
 function fC(v){return v>=1e8?(v/1e8).toFixed(0)+'亿':fA(v);}
 let tTm;function toast(m){$('tst').textContent=m;$('tst').classList.add('show');clearTimeout(tTm);tTm=setTimeout(()=>$('tst').classList.remove('show'),2500);}
 function ld(v){$('ldBar').classList.toggle('show',v);}
+
+// ===== 周期合成函数（新增）=====
+// 解析日期字符串为Date对象
+function parseDateStr(s){
+  if(s.includes('-')){
+    const [y,m,d]=s.split('-').map(Number);
+    return new Date(y,m-1,d);
+  }
+  const y=+s.substring(0,4),m=+s.substring(4,6)-1,d=+s.substring(6,8);
+  return new Date(y,m,d);
+}
+// 判断是否为同一周（周一为一周开始）
+function isSameWeek(d1,d2){
+  const getMonday=(d)=>{
+    const dt=new Date(d);
+    const day=dt.getDay();
+    const diff=dt.getDate()-day+(day===0?-6:1);
+    dt.setDate(diff);
+    dt.setHours(0,0,0,0);
+    return dt;
+  };
+  return getMonday(d1).getTime()===getMonday(d2).getTime();
+}
+// 判断是否为同一月
+function isSameMonth(d1,d2){
+  return d1.getFullYear()===d2.getFullYear() && d1.getMonth()===d2.getMonth();
+}
+// 从日线数据合成周K
+function synthesizeWeeklyFromDaily(daily, upToDate){
+  if(!daily||!daily.length)return [];
+  const result=[];
+  let currentWeek=null, weekOpen=null, weekHigh=-Infinity, weekLow=Infinity, weekClose=null;
+  let weekVol=0, weekAmt=0, weekFirstDate=null, weekLastDate=null, prevClose=null;
+  const upTo=upToDate?parseDateStr(upToDate):null;
+  for(let i=0;i<daily.length;i++){
+    const d=daily[i];
+    const dt=parseDateStr(d.date);
+    if(upTo && dt>upTo)break;
+    if(!currentWeek||!isSameWeek(dt,currentWeek)){
+      if(currentWeek!==null){
+        const baseClose=prevClose||weekOpen;
+        result.push({date:weekLastDate,open:weekOpen,close:weekClose,high:weekHigh,low:weekLow,vol:weekVol,amt:weekAmt,chg:((weekClose-baseClose)/baseClose*100),chgA:(weekClose-baseClose).toFixed(2),turn:''});
+        prevClose=weekClose;
+      }
+      currentWeek=new Date(dt);
+      weekOpen=d.open; weekHigh=d.high; weekLow=d.low; weekClose=d.close;
+      weekVol=d.vol; weekAmt=d.amt; weekFirstDate=d.date; weekLastDate=d.date;
+    }else{
+      weekHigh=Math.max(weekHigh,d.high); weekLow=Math.min(weekLow,d.low); weekClose=d.close;
+      weekVol+=d.vol; weekAmt+=d.amt; weekLastDate=d.date;
+    }
+  }
+  if(currentWeek!==null){
+    const baseClose=prevClose||weekOpen;
+    result.push({date:weekLastDate,open:weekOpen,close:weekClose,high:weekHigh,low:weekLow,vol:weekVol,amt:weekAmt,chg:((weekClose-baseClose)/baseClose*100),chgA:(weekClose-baseClose).toFixed(2),turn:''});
+  }
+  return result;
+}
+// 从日线数据合成月K
+function synthesizeMonthlyFromDaily(daily, upToDate){
+  if(!daily||!daily.length)return [];
+  const result=[];
+  let currentMonth=null, monthOpen=null, monthHigh=-Infinity, monthLow=Infinity, monthClose=null;
+  let monthVol=0, monthAmt=0, monthFirstDate=null, monthLastDate=null, prevClose=null;
+  const upTo=upToDate?parseDateStr(upToDate):null;
+  for(let i=0;i<daily.length;i++){
+    const d=daily[i];
+    const dt=parseDateStr(d.date);
+    if(upTo && dt>upTo)break;
+    if(!currentMonth||!isSameMonth(dt,currentMonth)){
+      if(currentMonth!==null){
+        const baseClose=prevClose||monthOpen;
+        result.push({date:monthLastDate,open:monthOpen,close:monthClose,high:monthHigh,low:monthLow,vol:monthVol,amt:monthAmt,chg:((monthClose-baseClose)/baseClose*100),chgA:(monthClose-baseClose).toFixed(2),turn:''});
+        prevClose=monthClose;
+      }
+      currentMonth=new Date(dt);
+      monthOpen=d.open; monthHigh=d.high; monthLow=d.low; monthClose=d.close;
+      monthVol=d.vol; monthAmt=d.amt; monthFirstDate=d.date; monthLastDate=d.date;
+    }else{
+      monthHigh=Math.max(monthHigh,d.high); monthLow=Math.min(monthLow,d.low); monthClose=d.close;
+      monthVol+=d.vol; monthAmt+=d.amt; monthLastDate=d.date;
+    }
+  }
+  if(currentMonth!==null){
+    const baseClose=prevClose||monthOpen;
+    result.push({date:monthLastDate,open:monthOpen,close:monthClose,high:monthHigh,low:monthLow,vol:monthVol,amt:monthAmt,chg:((monthClose-baseClose)/baseClose*100),chgA:(monthClose-baseClose).toFixed(2),turn:''});
+  }
+  return result;
+}
+// 找到目标日期在数据中的最近索引
+function findClosestDateIndex(targetDate, data){
+  if(!targetDate||!data||!data.length)return data.length-1;
+  const target=parseDateStr(targetDate);
+  let bestIdx=data.length-1, bestDiff=Infinity;
+  for(let i=0;i<data.length;i++){
+    const d=parseDateStr(data[i].date);
+    if(d<=target){
+      const diff=target.getTime()-d.getTime();
+      if(diff<bestDiff){bestDiff=diff;bestIdx=i;}
+    }
+  }
+  return bestIdx;
+}
+// 获取截止到指定日线索引的合成数据
+function getPeriodDataWithVisibleLen(klt, dailyLen){
+  const safeVisibleLen=Math.max(1, Math.min(dailyLen||dailyVisibleLen||cachedDailyData.length, cachedDailyData.length));
+  if(klt==='101'){
+    return cachedDailyData.slice(0, safeVisibleLen);
+  }
+  const upToDate=safeVisibleLen>0 && cachedDailyData.length?cachedDailyData[safeVisibleLen-1].date:null;
+  if(klt==='102'){
+    return synthesizeWeeklyFromDaily(cachedDailyData, upToDate);
+  }
+  if(klt==='103'){
+    return synthesizeMonthlyFromDaily(cachedDailyData, upToDate);
+  }
+  return cachedDailyData.slice(0, safeVisibleLen);
+}
 
 // ===== API配置 =====
 // 本地后端地址，如果本地后端未启动则自动降级到东方财富
@@ -451,6 +574,12 @@ async function loadK(){
 function parseD(r){
   fullData=r.klines.map(l=>{const p=l.split(',');return{date:p[0],open:+p[1],close:+p[2],high:+p[3],low:+p[4],vol:+p[5],amt:+p[6],amp:p[7],chg:+p[8],chgA:+p[9],turn:p[10]};});
   buildPad(fullData.length);
+  // 如果是日线数据，缓存下来（新增）
+  if(curKlt==='101'){
+    cachedDailyData=fullData.slice();
+    periodDataCache['101']=fullData.slice();
+    console.log('已缓存日线数据:', cachedDailyData.length+'条');
+  }
 }
 // 构建带右侧空白的数据
 function buildPad(len){
@@ -670,6 +799,14 @@ function enterRp(si){
   rpMode=true;$('rpTgl').classList.add('on');$('rpBdg').classList.add('show');setRpBtns(true);
   visibleLen=si||Math.min(60,fullData.length);
   if(visibleLen>fullData.length)visibleLen=fullData.length;
+  // 初始化dailyVisibleLen：找到当前日期对应的日线位置
+  if(fullData.length && cachedDailyData.length){
+    const currentDate=fullData[visibleLen-1].date;
+    const dailyIdx=findClosestDateIndex(currentDate, cachedDailyData);
+    dailyVisibleLen=dailyIdx+1;
+  }else{
+    dailyVisibleLen=visibleLen;
+  }
   updPrg();
   if(!savedZoom){
     const totalLen=visibleLen+PAD_RIGHT;
@@ -683,7 +820,21 @@ function exitRp(){stopP();rpMode=false;$('rpTgl').classList.remove('on');$('rpBd
 function showAll(){exitRp();visibleLen=fullData.length;savedZoom=null;renderC(fullData.length,true);if(fullData.length)updOHLC(fullData[fullData.length-1]);updPrg();}
 function stepF(){
   if(visibleLen>=fullData.length){stopP();return;}
-  visibleLen++;updPrg();
+  // 更新visibleLen（当前周期索引）
+  visibleLen++;
+  // 更新dailyVisibleLen（日线索引）
+  if(curKlt==='101'){
+    // 日线模式，同步增加
+    dailyVisibleLen=visibleLen;
+  }else{
+    // 周/月线模式：找到下一根K线的最后一个交易日在日线中的位置
+    if(visibleLen<=fullData.length && cachedDailyData.length){
+      const nextDate=fullData[visibleLen-1].date;
+      const dailyIdx=findClosestDateIndex(nextDate, cachedDailyData);
+      dailyVisibleLen=dailyIdx+1;
+    }
+  }
+  updPrg();
   // 智能滚动: 检查最新K线是否快到视口右边缘
   if(savedZoom){
     const totalLen=visibleLen+PAD_RIGHT;
@@ -699,7 +850,26 @@ function stepF(){
   renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
 }
-function stepB(){if(visibleLen<=1)return;visibleLen--;updPrg();renderC(visibleLen,false);if(visibleLen>0)updOHLC(fullData[visibleLen-1]);}
+function stepB(){
+  if(visibleLen<=1)return;
+  // 更新visibleLen（当前周期索引）
+  visibleLen--;
+  // 更新dailyVisibleLen（日线索引）
+  if(curKlt==='101'){
+    // 日线模式，同步减少
+    dailyVisibleLen=visibleLen;
+  }else{
+    // 周/月线模式：找到前一根K线的最后一个交易日在日线中的位置
+    if(visibleLen>=1 && cachedDailyData.length){
+      const prevDate=fullData[visibleLen-1].date;
+      const dailyIdx=findClosestDateIndex(prevDate, cachedDailyData);
+      dailyVisibleLen=dailyIdx+1;
+    }
+  }
+  updPrg();
+  renderC(visibleLen,false);
+  if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
+}
 function startP(){if(!rpMode)return;if(visibleLen>=fullData.length)enterRp(Math.min(60,fullData.length));playing=true;$('bPl').classList.add('playing');$('plIc').innerHTML='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';tick();}
 function stopP(){playing=false;clearTimeout(playTm);$('bPl').classList.remove('playing');$('plIc').innerHTML='<path d="M8 5v14l11-7z"/>';}
 function tick(){if(!playing)return;stepF();if(visibleLen<fullData.length)playTm=setTimeout(tick,playSpd);else{stopP();toast('回放完成');}}
@@ -820,9 +990,86 @@ $('rpTgl').addEventListener('click',()=>{
 $('bPl').addEventListener('click',()=>{if(!rpMode||!fullData.length)return;playing?stopP():startP();});
 $('bPv').addEventListener('click',()=>{if(rpMode){stopP();stepB();}});
 $('bNx').addEventListener('click',()=>{if(rpMode){stopP();stepF();}});
-$('prg').addEventListener('input',()=>{if(!rpMode)return;stopP();visibleLen=+$('prg').value;if(visibleLen<1)visibleLen=1;renderC(visibleLen,false);updPrg();if(visibleLen>0)updOHLC(fullData[visibleLen-1]);});
+$('prg').addEventListener('input',()=>{if(!rpMode)return;stopP();visibleLen=+$('prg').value;if(visibleLen<1)visibleLen=1;
+  // 拖动滑块时也要更新dailyVisibleLen
+  if(curKlt==='101'){
+    dailyVisibleLen=visibleLen;
+  }else if(fullData.length && cachedDailyData.length){
+    const currDate=fullData[visibleLen-1].date;
+    const dailyIdx=findClosestDateIndex(currDate, cachedDailyData);
+    dailyVisibleLen=dailyIdx+1;
+  }
+  renderC(visibleLen,false);updPrg();if(visibleLen>0)updOHLC(fullData[visibleLen-1]);});
 $('spd').addEventListener('change',()=>{playSpd=+$('spd').value;});
-$('pg').addEventListener('click',e=>{const b=e.target.closest('.per');if(!b)return;$('pg').querySelector('.act').classList.remove('act');b.classList.add('act');curKlt=b.dataset.k;if(curStock)loadK();});
+$('pg').addEventListener('click',e=>{const b=e.target.closest('.per');if(!b)return;$('pg').querySelector('.act').classList.remove('act');b.classList.add('act');const newKlt=b.dataset.k;
+  // 如果有日线缓存，直接无刷新切换（任何周期之间都可以）
+  if(curStock && cachedDailyData.length>0){
+    try{
+      // 第一步：确定目标日线位置（targetDailyVisibleLen）
+      let targetDailyVisibleLen=dailyVisibleLen;
+      let currentDate=null;
+
+      // 先获取当前显示的日期，不管在哪个周期
+      if(fullData.length){
+        const currIdx=rpMode?Math.min(visibleLen-1,fullData.length-1):(fullData.length-1);
+        if(currIdx>=0 && currIdx<fullData.length){
+          currentDate=fullData[currIdx].date;
+          // 如果还没有dailyVisibleLen，初始化它
+          if(!dailyVisibleLen || dailyVisibleLen<=0){
+            const dailyIdx=findClosestDateIndex(currentDate, cachedDailyData);
+            targetDailyVisibleLen=dailyIdx+1;
+          }else{
+            targetDailyVisibleLen=dailyVisibleLen;
+          }
+        }
+      }
+
+      // 更新curKlt和dailyVisibleLen
+      curKlt=newKlt;
+      dailyVisibleLen=targetDailyVisibleLen;
+
+      // 第二步：合成新周期数据（始终用完整数据，这样才能点击下一根）
+      let fullPeriodData=[];
+      if(newKlt==='101'){
+        fullPeriodData=cachedDailyData.slice();
+      }else if(newKlt==='102'){
+        fullPeriodData=synthesizeWeeklyFromDaily(cachedDailyData);
+      }else if(newKlt==='103'){
+        fullPeriodData=synthesizeMonthlyFromDaily(cachedDailyData);
+      }
+      fullData=fullPeriodData;
+
+      // 第三步：根据当前日线位置，找到新周期中对应的visibleLen
+      if(currentDate && fullData.length){
+        const newIdx=findClosestDateIndex(currentDate, fullData);
+        visibleLen=newIdx+1;
+      }else{
+        visibleLen=fullData.length;
+      }
+
+      // 重新渲染
+      buildPad(fullData.length);
+      savedZoom=null;
+      if(rpMode){
+        renderC(visibleLen,true);
+        if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
+      }else{
+        renderC(fullData.length,true);
+        if(fullData.length)updOHLC(fullData[fullData.length-1]);
+      }
+      updSym();
+      updPrg();
+      console.log('无刷新切换周期成功:', newKlt==='101'?'日线':newKlt==='102'?'周线':'月线', '日期:', currentDate, '日线索引:', dailyVisibleLen, '周期索引:', visibleLen);
+      return;
+    }catch(err){
+      console.warn('无刷新切换失败，回退到正常加载:', err);
+      // 出错时确保curKlt也更新
+      curKlt=newKlt;
+    }
+  }
+  // 回退到原来的加载方式
+  curKlt=newKlt;if(curStock)loadK();
+});
 $('bLt').addEventListener('click',()=>{if(!fullData.length)return;if(rpMode){showAll();toast('已退出回放');}else{savedZoom=null;renderC(fullData.length,true);toast('已跳到最新');}});
 $('bRp').addEventListener('click',()=>{$('rightPanel').classList.toggle('collapsed');$('resizeH').style.display=$('rightPanel').classList.contains('collapsed')?'none':'';setTimeout(()=>chart&&chart.resize(),10);});
 $('bFs').addEventListener('click',tFs);
