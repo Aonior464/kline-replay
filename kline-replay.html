@@ -40,14 +40,15 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 #kc{width:100%;height:100%}
 .ohlc-bar{position:absolute;top:6px;left:10px;z-index:5;font-size:11px;display:flex;flex-wrap:wrap;gap:3px 10px;pointer-events:none}
 .ohlc-bar span{white-space:nowrap} .ol{color:var(--text2)} .ov{font-weight:600} .ot{color:var(--text);font-weight:700;font-size:12px;margin-right:4px}
-.rp-badge{position:absolute;top:6px;right:12px;z-index:5;background:var(--accent);color:#fff;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;display:none;pointer-events:none}
-.rp-badge.show{display:flex;align-items:center;gap:5px} .rp-badge svg{width:12px;height:12px;fill:#fff}
+.rp-badge{display:none!important}
 .chart-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);font-size:15px;gap:10px;z-index:3}
 .chart-hint .hs{font-size:12px;color:#ccc} .chart-hint.hidden{display:none}
 .chart-hint kbd{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:var(--panel);font-family:var(--font);font-size:13px;color:var(--text2)}
 
 /* ===== Replay Bar ===== */
-.replay-bar{height:52px;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0}
+.replay-bar{height:48px;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;justify-content:space-between}
+.rp-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.rp-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .rp-tgl{height:34px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:600;background:var(--bg);border:1px solid var(--border);color:var(--text2);display:flex;align-items:center;gap:6px;transition:.15s}
 .rp-tgl:hover{border-color:var(--accent);color:var(--accent)} .rp-tgl.on{background:var(--accent);border-color:var(--accent);color:#fff} .rp-tgl.on:hover{background:var(--accent-h)}
 .rp-tgl svg{width:15px;height:15px;fill:currentColor}
@@ -57,7 +58,7 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 .rb:disabled{opacity:.2;cursor:default} .rb:disabled:hover{border-color:var(--border);color:var(--text2)} .rb svg{width:16px;height:16px;fill:currentColor}
 .prg-w{flex:1;display:flex;align-items:center;gap:10px;min-width:120px}
 .prg-w input[type=range]{flex:1;height:6px;accent-color:var(--accent);cursor:pointer} .prg-w input[type=range]:disabled{opacity:.3;cursor:default}
-.prg-t{font-size:12px;color:var(--text2);white-space:nowrap;min-width:140px}
+.prg-t{font-size:12px;color:var(--text);font-weight:500;white-space:nowrap;min-width:140px}
 .spd-sel{height:34px;padding:0 10px;border-radius:8px;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:12px;font-family:var(--font);cursor:pointer;outline:none} .spd-sel:disabled{opacity:.3}
 .rp-keys{font-size:11px;color:var(--text3);display:flex;gap:12px;margin-left:8px}
 .rp-keys kbd{display:inline-block;padding:1px 5px;border:1px solid var(--border);border-radius:3px;background:var(--bg);font-family:var(--font);font-size:10px;color:var(--text2)}
@@ -79,11 +80,12 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 .wl-hdr span{font-size:11px;color:var(--text3)} .wl-btns{display:flex;gap:2px}
 .wi{width:26px;height:26px;border-radius:6px;background:0;color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:15px;transition:.12s}
 .wi:hover{background:var(--hover);color:var(--accent)}
-.wl-item{display:flex;align-items:center;padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border-l);transition:transform .2s,background .1s;position:relative;overflow:hidden}
+.wl-item{display:flex;align-items:center;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border-l);transition:transform .2s,background .1s;position:relative;overflow:hidden}
 .wl-item:hover{background:var(--hover)}
 .wl-item.cur{background:var(--accent-bg);border-left:3px solid var(--accent);padding-left:9px}
-.wl-inf{flex:1;min-width:0} .wl-c{font-size:12px;font-weight:600} .wl-n{font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wl-p{text-align:right;flex-shrink:0} .wl-l{font-size:12px;font-weight:600} .wl-g{font-size:10px}
+.wl-inf{flex:1;min-width:0} .wl-n{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .wl-c{font-size:11px;color:var(--text3);margin-top:2px}
+.wl-p{text-align:right;flex-shrink:0;display:flex;align-items:center;gap:10px} .wl-l{font-size:14px;font-weight:600} .wl-g{font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;min-width:64px;text-align:center}
+.wl-g.pu{background:rgba(239,83,80,.12)} .wl-g.pd{background:rgba(38,166,154,.12)}
 /* Swipe-to-delete */
 .wl-item-inner{display:flex;align-items:center;width:100%}
 .wl-e{padding:24px 12px;text-align:center;color:var(--text3);font-size:11px;line-height:1.8}
@@ -112,12 +114,12 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 
 /* ===== Simulation Account ===== */
 .sim-panel{padding:0}
-.sim-summary{padding:10px 12px;border-bottom:1px solid var(--border-l);background:var(--panel)}
-.sim-title{font-size:11px;font-weight:600;color:var(--text);padding:8px 12px 6px;border-bottom:1px solid var(--border-l)}
-.sim-total{padding:6px 0 4px;display:flex;justify-content:space-between;align-items:baseline}
-.sim-total-label{font-size:11px;color:var(--text2)}.sim-total-value{font-size:18px;font-weight:700}
-.sim-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
-.sim-k{color:var(--text2)} .sim-v{font-weight:500}
+.sim-summary{padding:12px;border-bottom:1px solid var(--border-l);background:var(--panel)}
+.sim-title{font-size:12px;font-weight:700;color:var(--text);padding:10px 12px 8px;border-bottom:1px solid var(--border-l)}
+.sim-total{padding:6px 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.sim-total-label{font-size:12px;color:var(--text2)}.sim-total-value{font-size:20px;font-weight:700}
+.sim-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}
+.sim-k{color:var(--text2)} .sim-v{font-weight:600}
 .sim-section{border-bottom:1px solid var(--border-l)}
 .sim-empty{padding:16px 12px;text-align:center;color:var(--text3);font-size:11px}
 .sim-pos-item{padding:8px 12px;border-bottom:1px solid var(--border-l);position:relative}
@@ -126,19 +128,20 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 .sim-pos-info{display:grid;grid-template-columns:1fr 1fr;gap:1px}
 .sim-pos-row{display:flex;justify-content:space-between;font-size:10px;padding:1px 0}
 .sim-pos-row span:first-child{color:var(--text2)} .sim-pos-row span:last-child{font-weight:500}
-.sim-sell-btn{height:22px;padding:0 10px;border-radius:4px;background:var(--dn);color:#fff;font-size:10px;font-weight:600;cursor:pointer;transition:.15s}
+.sim-sell-btn{height:36px;padding:0;border-radius:6px;background:var(--dn);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
 .sim-sell-btn:hover{opacity:.85}
-.sim-sell-sm{height:20px;padding:0 8px;font-size:9px;font-weight:500;background:transparent;color:var(--dn);border:1px solid var(--dn)}
+.sim-sell-sm{background:transparent;color:var(--dn);border:1.5px solid var(--dn)}
 .sim-sell-sm:hover{background:var(--dn);color:#fff}
-.sim-sell-btns{display:flex;gap:4px;padding:4px 12px 6px;justify-content:flex-end}
 .sim-actions{padding:0}
-.sim-action-info{display:flex;justify-content:space-between;align-items:center;padding:6px 12px 0;font-size:12px;font-weight:600}
-.sim-cur-price{color:var(--accent)}
-.sim-action-row{display:flex;gap:6px;padding:6px 12px 10px}
-.sim-qty-sel{height:28px;padding:0 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-family:var(--font);cursor:pointer;outline:none;flex:1}
-.sim-buy-btn{height:28px;padding:0 14px;border-radius:6px;background:var(--up);color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;flex:1}
+.sim-action-info{display:flex;justify-content:space-between;align-items:center;padding:8px 12px 0;font-size:13px;font-weight:700}
+.sim-cur-price{color:var(--accent);font-size:16px}
+.sim-action-row{display:flex;gap:8px;padding:8px 12px 0;align-items:center}
+.sim-action-row>button{flex:1}
+.sim-action-row2{display:flex;gap:8px;padding:6px 12px 10px;align-items:center}
+.sim-qty-sel{height:36px;padding:0 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:var(--font);cursor:pointer;outline:none}
+.sim-buy-btn{height:36px;padding:0 0;border-radius:6px;background:var(--up);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;flex:1}
 .sim-buy-btn:hover{opacity:.85}
-.sim-sellall-btn{height:28px;padding:0 10px;border-radius:6px;background:var(--dn);color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;flex:1}
+.sim-sellall-btn{height:36px;padding:0 0;border-radius:6px;background:var(--dn);color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;flex:1}
 .sim-sellall-btn:hover{opacity:.85}
 .sim-trade-item{padding:6px 12px;border-bottom:1px solid var(--border-l);font-size:11px}
 .sim-trade-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
@@ -166,35 +169,44 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 .train-opt label{display:flex;align-items:center;gap:6px;cursor:pointer}
 .train-opt input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;cursor:pointer}
 .train-opt select{height:26px;padding:0 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:11px;font-family:var(--font);cursor:pointer;outline:none}
-.train-current{border-bottom:1px solid var(--border-l)}
-.train-cur-title{font-size:11px;font-weight:600;color:var(--text);padding:8px 12px 6px;border-bottom:1px solid var(--border-l)}
+.train-current{}
+.train-cur-title{font-size:12px;font-weight:700;color:var(--text);padding:10px 12px 8px;border-bottom:1px solid var(--border-l)}
 .train-cur-body{padding:8px 12px}
-.train-cur-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
-.train-cur-row span:first-child{color:var(--text2)} .train-cur-row span:last-child{font-weight:500}
+.train-cur-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}
+.train-cur-row span:first-child{color:var(--text2)} .train-cur-row span:last-child{font-weight:600}
 .train-cur-actions{display:flex;gap:6px;padding:8px 12px 10px}
 .train-reveal-btn{flex:1;height:30px;border-radius:6px;background:var(--bg);border:1px solid var(--accent);color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
 .train-reveal-btn:hover{background:var(--accent-bg)}
 .train-next-btn{flex:1;height:30px;border-radius:6px;background:var(--accent);border:none;color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:.15s}
 .train-next-btn:hover{background:var(--accent-h)}
-.train-stats{border-bottom:1px solid var(--border-l)}
+.train-stats{}
 .train-stats-title{font-size:11px;font-weight:600;color:var(--text);padding:8px 12px 6px;border-bottom:1px solid var(--border-l)}
 .train-stats-body{padding:8px 12px}
 .train-stat-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
 .train-stat-row span:first-child{color:var(--text2)} .train-stat-row span:last-child{font-weight:500}
-.train-stat-empty{padding:16px 12px;text-align:center;color:var(--text3);font-size:11px}
+.train-stat-empty{padding:16px 12px;text-align:center;color:var(--text3);font-size:11px;border:none}
 .train-reset{padding:12px;text-align:center}
 .train-reset-btn{height:26px;padding:0 16px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:11px;cursor:pointer;transition:.15s}
 .train-reset-btn:hover{border-color:#ef5350;color:#ef5350}
 .train-blind-tag{display:inline-block;padding:1px 6px;border-radius:4px;background:#ffc107;color:#000;font-size:9px;font-weight:600;margin-left:4px}
-.train-trade-section{margin:8px 0;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border-l);border-radius:6px}
-.train-trade-hdr{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:6px;color:var(--text-s)}
-.train-trade-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-.train-trade-row .sim-qty-sel{flex:1}
-.train-trade-row .sim-buy-btn,.train-trade-row .sim-sellall-btn{padding:4px 10px;font-size:11px}
-.train-pos-row{display:flex;justify-content:space-between;align-items:center;gap:4px;padding:4px 0;font-size:11px;border-top:1px solid var(--border-l)}
-.train-pos-sell-btns{display:flex;gap:4px;justify-content:flex-end;padding:2px 0 4px}
-.train-pos-sell-btns .sim-sell-btn{padding:2px 8px;font-size:10px}
-.train-cash-row{font-size:10px;color:var(--text-s);text-align:right;padding-top:4px}
+.train-trade-section{margin:0;padding:0;border-top:1px solid var(--border-l);border-bottom:1px solid var(--border-l)}
+.train-trade-hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 12px 0}
+.train-trade-hdr span:first-child{font-size:12px;color:var(--text2)}
+.train-trade-hdr span:last-child{font-size:18px;font-weight:700;color:var(--accent)}
+.train-cash-row{font-size:12px;color:var(--text2);text-align:right;padding:4px 12px 10px}
+
+/* ===== Position Overlay Zones ===== */
+#posOverlayWrap{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:4;display:none}
+.pos-zone{position:absolute;overflow:visible}
+.pos-zone-tp{background:rgba(38,166,154,0.10);border:1px solid rgba(38,166,154,0.25);border-bottom:none;pointer-events:all;cursor:move}
+.pos-zone-sl{background:rgba(239,83,80,0.10);border:1px solid rgba(239,83,80,0.25);border-top:none;pointer-events:all;cursor:move}
+.pos-zone-tag{position:absolute;padding:0 4px;font-size:9px;font-weight:500;pointer-events:none;white-space:nowrap;line-height:16px}
+.pos-zone-tp .pos-zone-tag{bottom:calc(100% + 2px);left:0;color:#26a69a}
+.pos-zone-sl .pos-zone-tag{top:calc(100% + 2px);left:0;color:#ef5350}
+.pos-entry-line{display:none}
+.pos-handle{position:absolute;pointer-events:all;z-index:7}
+.pos-h-tl{cursor:nwse-resize}.pos-h-tr{cursor:nesw-resize}.pos-h-bl{cursor:nesw-resize}.pos-h-br{cursor:nwse-resize}
+.pos-h-t,.pos-h-b{cursor:ns-resize}.pos-h-l,.pos-h-r{cursor:ew-resize}
 
 /* ===== Search Modal ===== */
 .sm{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;padding-top:60px}
@@ -241,6 +253,7 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
     <div class="chart-area">
       <div class="ohlc-bar" id="ohlc"></div>
       <div class="rp-badge" id="rpBdg"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>回放中</div>
+      <div id="posOverlayWrap"></div>
       <div id="kc"></div>
       <div class="chart-hint" id="chHint">
         <svg viewBox="0 0 24 24" style="width:44px;height:44px;fill:var(--border)"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
@@ -250,23 +263,25 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
   </div>
   <div class="resize-handle" id="resizeH"></div>
   <div class="right-panel" id="rightPanel">
-    <div class="rp-tabs"><button class="rp-tab act" data-t="wl">自选股</button><button class="rp-tab" data-t="sim">模拟账户</button><button class="rp-tab" data-t="train">随机训练</button></div>
+    <div class="rp-tabs"><button class="rp-tab" data-t="wl">自选股</button><button class="rp-tab" data-t="sim">模拟账户</button><button class="rp-tab act" data-t="train">随机训练</button></div>
     <div class="rp-body" id="rpBody"></div>
   </div>
 </div>
 
 <div class="replay-bar">
-  <button class="rp-tgl" id="rpTgl"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>回放</button>
-  <div class="td"></div>
-  <div class="rctl">
-    <button class="rb" id="bPv" disabled><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-    <button class="rb" id="bPl" disabled><svg viewBox="0 0 24 24" id="plIc"><path d="M8 5v14l11-7z"/></svg></button>
-    <button class="rb" id="bNx" disabled><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+  <div class="rp-left">
+    <div class="prg-w"><input type="range" id="prg" min="1" max="100" value="100" disabled><span class="prg-t" id="pLbl">就绪</span></div>
   </div>
-  <div class="td"></div>
-  <div class="prg-w"><input type="range" id="prg" min="1" max="100" value="100" disabled><span class="prg-t" id="pLbl">就绪</span></div>
-  <select class="spd-sel" id="spd" disabled><option value="2000">0.5x</option><option value="1000" selected>1x</option><option value="500">2x</option><option value="250">4x</option><option value="100">10x</option></select>
-  <div class="rp-keys"><span><kbd>Space</kbd> 播放</span><span><kbd>←</kbd><kbd>→</kbd> 逐根</span><span><kbd>Esc</kbd> 退出</span></div>
+  <div class="rp-right">
+    <div class="td"></div>
+    <div class="rctl">
+      <button class="rb" id="bPv" disabled><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+      <button class="rb" id="bPl" disabled><svg viewBox="0 0 24 24" id="plIc"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="rb" id="bNx" disabled><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+    </div>
+    <select class="spd-sel" id="spd" style="display:none" disabled><option value="1000" selected>1x</option></select>
+    <button class="rp-tgl" id="rpTgl"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>回放</button>
+  </div>
 </div>
 
 <div class="sm" id="sMod"><div class="sm-bk" id="sBk"></div><div class="sm-d"><div class="sm-iw"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input class="sm-i" id="sInp" placeholder="输入股票代码或名称..." autocomplete="off"></div><div class="sm-r" id="sRes"><div class="sm-sec" id="rcT" style="display:none">最近搜索</div><div id="rcL"></div><div class="sm-sec" id="rsT" style="display:none">搜索结果</div><div id="rsL"></div></div></div></div>
@@ -281,12 +296,14 @@ const PAD_RIGHT = 40; // 右侧空白填充根数，让K线不贴右边
 let chart=null, dailyData=[], fullData=[], padData=[], visibleLen=0, playing=false, playTm=null, playSpd=1000;
 let curStock=null, curKlt='101', sTm=null, rpMode=false;
 let dailyVisibleLen=0; // 回放位置（日K索引），始终以日K为基准
-let wlGroups={}, wlGroupNames=[], activeWlGroup='自选股';
-let recent=[], sFocIdx=-1, detail=null, curTab='wl';
+let wlGroups={}, wlGroupNames=[], activeWlGroup='自选股', wlSortMode=0;
+let recent=[], sFocIdx=-1, detail=null, curTab='train';
 let savedZoom=null;
 let simAccount=null, simIdCounter=0;
 const SIM_INITIAL=100000;
 let trainStockPool=[], trainPoolExpiry=0, trainSession=null, trainStats=null, trainBlindPref=false;
+let posOverlays=[]; // [{id,entry,tp,sl,qty,xIdx,xSpan,code,el}]
+let posOvIdCtr=0;
 
 const $=id=>document.getElementById(id);
 
@@ -504,9 +521,9 @@ function addRc(s){recent=recent.filter(x=>x.code!==s.code);recent.unshift({code:
 // ===== Search =====
 function openS(){$('sMod').classList.add('show');$('sInp').value='';$('sInp').focus();sFocIdx=-1;$('rsL').innerHTML='';$('rsT').style.display='none';renderRc();}
 function closeS(){$('sMod').classList.remove('show');}
-function renderRc(){if(!recent.length){$('rcT').style.display='none';$('rcL').innerHTML='';return;}$('rcT').style.display='block';$('rcL').innerHTML=recent.map(s=>`<div class="si" data-c="${s.code}" data-n="${s.name}" data-s="${s.secid}" data-m="${s.mkt}"><span class="c">${s.code}</span><span class="n">${s.name}</span><span class="m">${s.mkt==0?'深A':s.mkt==1?'沪A':'北A'}</span></div>`).join('');}
-async function doS(kw){if(!kw.trim()){$('rsL').innerHTML='';$('rsT').style.display='none';return;}try{console.log('搜索:', kw);const d=await searchStocks(kw);console.log('搜索响应:', d);const its=(d&&d.QuotationCodeTable&&d.QuotationCodeTable.Data)||[];$('rsT').style.display='block';if(!its.length){$('rsL').innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">无结果</div>';return;}$('rsL').innerHTML=its.slice(0,10).map(it=>{const m=it.MarketId||it.MktNum;const secid=(m==1?'1.':'0.')+it.Code;return`<div class="si" data-c="${it.Code}" data-n="${it.Name}" data-s="${secid}" data-m="${m}"><span class="c">${it.Code}</span><span class="n">${it.Name}</span><span class="m">${m==0?'深A':m==1?'沪A':m==2?'北A':'其他'}</span></div>`;}).join('');sFocIdx=-1;}catch(e){console.error('搜索错误:', e);}}
-function selItem(el){if(trainSession)endTrain();curStock={code:el.dataset.c,name:el.dataset.n,secid:el.dataset.s,mkt:el.dataset.m};addRc(curStock);closeS();loadK();}
+function renderRc(){if(!recent.length){$('rcT').style.display='none';$('rcL').style.display='none';$('rcL').innerHTML='';return;}$('rcT').style.display='block';$('rcL').style.display='';$('rcL').innerHTML=recent.map(s=>`<div class="si" data-c="${s.code}" data-n="${s.name}" data-s="${s.secid}" data-m="${s.mkt}"><span class="c">${s.code}</span><span class="n">${s.name}</span><span class="m">${s.mkt==0?'深A':s.mkt==1?'沪A':'北A'}</span></div>`).join('');}
+async function doS(kw){if(!kw.trim()){$('rsL').innerHTML='';$('rsT').style.display='none';$('rcT').style.display='';$('rcL').style.display='';renderRc();return;}$('rcT').style.display='none';$('rcL').style.display='none';try{console.log('搜索:', kw);const d=await searchStocks(kw);console.log('搜索响应:', d);const its=(d&&d.QuotationCodeTable&&d.QuotationCodeTable.Data)||[];$('rsT').style.display='block';if(!its.length){$('rsL').innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">无结果</div>';return;}$('rsL').innerHTML=its.slice(0,10).map(it=>{const m=it.Market!=null?it.Market:(it.MarketId!=null?it.MarketId:it.MktNum);const secid=it.secid||(m==1?'1.':'0.')+it.Code;return`<div class="si" data-c="${it.Code}" data-n="${it.Name}" data-s="${secid}" data-m="${m}"><span class="c">${it.Code}</span><span class="n">${it.Name}</span><span class="m">${m==0?'深A':m==1?'沪A':m==2?'北A':'其他'}</span></div>`;}).join('');sFocIdx=-1;}catch(e){console.error('搜索错误:', e);}}
+function selItem(el){if(trainSession)endTrain();curStock={code:el.dataset.c,name:el.dataset.n,secid:el.dataset.s,mkt:el.dataset.m};addRc(curStock);renderRc();closeS();loadK();}
 $('sInp').addEventListener('input',()=>{clearTimeout(sTm);sTm=setTimeout(()=>doS($('sInp').value),300);});
 $('sInp').addEventListener('keydown',e=>{const its=$('sRes').querySelectorAll('.si');if(e.key==='ArrowDown'){e.preventDefault();sFocIdx=Math.min(sFocIdx+1,its.length-1);its.forEach((el,i)=>el.classList.toggle('fc',i===sFocIdx));if(its[sFocIdx])its[sFocIdx].scrollIntoView({block:'nearest'});}else if(e.key==='ArrowUp'){e.preventDefault();sFocIdx=Math.max(sFocIdx-1,0);its.forEach((el,i)=>el.classList.toggle('fc',i===sFocIdx));}else if(e.key==='Enter'){e.preventDefault();if(sFocIdx>=0&&its[sFocIdx])selItem(its[sFocIdx]);else if(its.length)selItem(its[0]);}else if(e.key==='Escape')closeS();});
 $('sRes').addEventListener('click',e=>{const i=e.target.closest('.si');if(i)selItem(i);});
@@ -551,6 +568,7 @@ async function loadK(restoreDate, restoreRp){
     }
     hlWl();
     if(curTab==='sim')renderSim();
+    removeAllPosOverlays();
   }catch(e){console.error('loadK render error:',e);toast('渲染失败: '+e.message);}
   ld(false);
 }
@@ -737,7 +755,7 @@ function initChart(){
   chart.on('dblclick',onDbl);
   chart.on('mousemove',onMM);
   chart.on('globalout',()=>{/* keep last ohlc */});
-  chart.on('dataZoom',()=>{const z=chart.getOption().dataZoom[0];savedZoom={start:z.start,end:z.end};});
+  chart.on('dataZoom',()=>{const z=chart.getOption().dataZoom[0];savedZoom={start:z.start,end:z.end};renderPosZones();});
   new ResizeObserver(()=>chart&&chart.resize()).observe(c);
   savedZoom=null;
 }
@@ -821,10 +839,10 @@ function renderC(dataLen,resetView){
           `<span style="color:#787b86">收盘</span><span style="color:${c};font-weight:500">${d.close.toFixed(2)}</span>`+
           `<span style="color:#787b86">涨跌</span><span style="color:${c};font-weight:500">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span>`+
           `<span style="color:#787b86">成交量</span><span style="font-weight:500">${fV(d.vol)}</span>`+
-          `<span style="color:#f5a623">MA5</span><span style="font-weight:500">${ma5Val?ma5Val.toFixed(3):'-'}</span>`+
-          `<span style="color:#4fc3f7">MA10</span><span style="font-weight:500">${ma10Val?ma10Val.toFixed(3):'-'}</span>`+
-          `<span style="color:#ce93d8">MA20</span><span style="font-weight:500">${ma20Val?ma20Val.toFixed(3):'-'}</span>`+
-          `<span style="color:#81c784">MA60</span><span style="font-weight:500">${ma60Val?ma60Val.toFixed(3):'-'}</span>`+
+          `<span style="color:#f5a623">MA5</span><span style="font-weight:500">${ma5Val?ma5Val.toFixed(4):'-'}</span>`+
+          `<span style="color:#4fc3f7">MA10</span><span style="font-weight:500">${ma10Val?ma10Val.toFixed(4):'-'}</span>`+
+          `<span style="color:#ce93d8">MA20</span><span style="font-weight:500">${ma20Val?ma20Val.toFixed(4):'-'}</span>`+
+          `<span style="color:#81c784">MA60</span><span style="font-weight:500">${ma60Val?ma60Val.toFixed(4):'-'}</span>`+
           `<span style="color:#787b86">换手率</span><span style="font-weight:500">${d.turn}%</span></div>`;
       }
     },
@@ -852,9 +870,125 @@ function renderC(dataLen,resetView){
   const tm=getTradeMarkers(dataLen);if(tm.length)opt.series[0].markPoint={data:tm,animation:false};
   chart.setOption(opt,true);
   if(!resetView&&savedZoom){chart.dispatchAction({type:'dataZoom',start:zS,end:zE});}
+  renderPosZones();
 }
 
-function maC(d,n,len){const r=[];for(let i=0;i<len;i++){if(i<n-1){r.push(null);continue;}let s=0;for(let j=0;j<n;j++)s+=d[i-j].close;r.push(+(s/n).toFixed(3));}return r;}
+// ===== Position Overlay (Multiple HTML Zones) =====
+function createPosOverlay(entry,qty){
+  const dl=rpMode?visibleLen:fullData.length;
+  const id=++posOvIdCtr;
+  const po={id,entry:+entry.toFixed(2),tp:+(entry*1.10).toFixed(2),sl:+(entry*0.92).toFixed(2),tpPct:10,slPct:-8,qty,xIdx:Math.max(0,dl-1),xSpan:20,code:curStock?curStock.code:''};
+  const wrap=document.createElement('div');wrap.dataset.posId=id;
+  wrap.innerHTML='<div class="pos-zone pos-zone-tp" data-a="tp"><div class="pos-zone-tag"></div></div>'
+    +'<div class="pos-entry-line"></div>'
+    +'<div class="pos-zone pos-zone-sl" data-a="sl"><div class="pos-zone-tag"></div></div>'
+    +'<div class="pos-handle pos-h-tl" data-a="tl"></div><div class="pos-handle pos-h-tr" data-a="tr"></div>'
+    +'<div class="pos-handle pos-h-bl" data-a="bl"></div><div class="pos-handle pos-h-br" data-a="br"></div>'
+    +'<div class="pos-handle pos-h-t" data-a="t"></div><div class="pos-handle pos-h-b" data-a="b"></div>'
+    +'<div class="pos-handle pos-h-l" data-a="l"></div><div class="pos-handle pos-h-r" data-a="r"></div>';
+  po.el=wrap;
+  $('posOverlayWrap').appendChild(wrap);
+  posOverlays.push(po);
+  renderPosZones();
+  return po;
+}
+function removePosOverlay(id){
+  const idx=posOverlays.findIndex(p=>p.id===id);
+  if(idx<0)return;
+  const po=posOverlays[idx];
+  if(po.el&&po.el.parentNode)po.el.parentNode.removeChild(po.el);
+  posOverlays.splice(idx,1);
+  if(!posOverlays.length)$('posOverlayWrap').style.display='none';
+}
+function removeAllPosOverlays(code){
+  const toRemove=code?posOverlays.filter(p=>p.code===code):posOverlays.slice();
+  toRemove.forEach(p=>removePosOverlay(p.id));
+}
+function renderPosZones(){
+  if(!chart||!posOverlays.length){$('posOverlayWrap').style.display='none';return;}
+  const gr=chart.getModel().getComponent('grid',0).coordinateSystem.getRect();
+  posOverlays.forEach(po=>{
+    try{
+      const entryY=chart.convertToPixel({gridIndex:0},[0,po.entry])[1];
+      const tpY=chart.convertToPixel({gridIndex:0},[0,po.tp])[1];
+      const slY=chart.convertToPixel({gridIndex:0},[0,po.sl])[1];
+      const x1=chart.convertToPixel({gridIndex:0},[po.xIdx,0])[0];
+      const x2=chart.convertToPixel({gridIndex:0},[po.xIdx+po.xSpan,0])[0];
+      if([entryY,tpY,slY,x1,x2].some(v=>v==null||isNaN(v))){po.el.style.display='none';return;}
+      const gTop=gr.y,gBot=gr.y+gr.height;
+      const L=Math.max(gr.x,Math.min(x1,x2));
+      const R=Math.min(gr.x+gr.width,Math.max(x1,x2));
+      const W=Math.max(0,R-L);
+      if(W<2){po.el.style.display='none';return;}
+      po.el.style.display='';
+      const cTpY=Math.max(gTop,tpY),cEntryY=Math.min(gBot,Math.max(gTop,entryY)),cSlY=Math.min(gBot,slY);
+      const tpH=Math.max(0,cEntryY-cTpY),slH=Math.max(0,cSlY-cEntryY);
+      const ch=po.el.children;
+      ch[0].style.cssText='position:absolute;left:'+L+'px;width:'+W+'px;top:'+cTpY+'px;height:'+tpH+'px;';
+      ch[1].style.cssText='display:none;';
+      ch[2].style.cssText='position:absolute;left:'+L+'px;width:'+W+'px;top:'+cEntryY+'px;height:'+slH+'px;';
+      const cs=12,csh=6;
+      ch[3].style.cssText='position:absolute;left:'+(L-csh)+'px;top:'+(cTpY-csh)+'px;width:'+cs+'px;height:'+cs+'px;';
+      ch[4].style.cssText='position:absolute;left:'+(L+W-csh)+'px;top:'+(cTpY-csh)+'px;width:'+cs+'px;height:'+cs+'px;';
+      ch[5].style.cssText='position:absolute;left:'+(L-csh)+'px;top:'+(cSlY-csh)+'px;width:'+cs+'px;height:'+cs+'px;';
+      ch[6].style.cssText='position:absolute;left:'+(L+W-csh)+'px;top:'+(cSlY-csh)+'px;width:'+cs+'px;height:'+cs+'px;';
+      ch[7].style.cssText='position:absolute;left:'+(L+cs)+'px;width:'+(W-cs*2)+'px;top:'+(cTpY-4)+'px;height:8px;';
+      ch[8].style.cssText='position:absolute;left:'+(L+cs)+'px;width:'+(W-cs*2)+'px;top:'+(cSlY-4)+'px;height:8px;';
+      ch[9].style.cssText='position:absolute;left:'+(L-4)+'px;width:8px;top:'+(cTpY+cs)+'px;height:'+(tpH+slH-cs*2)+'px;';
+      ch[10].style.cssText='position:absolute;left:'+(L+W-4)+'px;width:8px;top:'+(cTpY+cs)+'px;height:'+(tpH+slH-cs*2)+'px;';
+      ch[0].querySelector('.pos-zone-tag').textContent=po.tp.toFixed(2)+' +'+po.tpPct+'%';
+      ch[2].querySelector('.pos-zone-tag').textContent=po.sl.toFixed(2)+' '+po.slPct+'%';
+    }catch(e){po.el.style.display='none';}
+  });
+  $('posOverlayWrap').style.display='block';
+}
+// Drag (event delegation on wrap)
+(function(){
+  let drag=null,dragPo=null;
+  const cursors={tl:'nwse-resize',tr:'nesw-resize',bl:'nesw-resize',br:'nwse-resize',t:'ns-resize',b:'ns-resize',l:'ew-resize',r:'ew-resize',tp:'move',sl:'move'};
+  function findPo(el){
+    let n=el;while(n&&n!==$('posOverlayWrap')){if(n.dataset&&n.dataset.posId)return posOverlays.find(p=>p.id===+n.dataset.posId);n=n.parentNode;}
+    return null;
+  }
+  $('posOverlayWrap').addEventListener('mousedown',function(e){
+    const a=e.target.dataset&&e.target.dataset.a;if(!a||!chart)return;
+    const po=findPo(e.target);if(!po)return;
+    e.preventDefault();e.stopPropagation();
+    const rect=$('kc').getBoundingClientRect();
+    drag={type:a,startX:e.clientX-rect.left,startY:e.clientY-rect.top,oEntry:po.entry,oTp:po.tp,oSl:po.sl,oXIdx:po.xIdx};
+    dragPo=po;
+    document.body.style.cursor=cursors[a]||'default';
+    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+  });
+  function onMove(e){
+    if(!drag||!dragPo||!chart)return;
+    const rect=$('kc').getBoundingClientRect();
+    const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const po=dragPo,t=drag.type;
+    if(t==='tp'||t==='sl'){
+      // body → move entire box
+      const pNow=chart.convertFromPixel({gridIndex:0},[0,my])[1];
+      const pStart=chart.convertFromPixel({gridIndex:0},[0,drag.startY])[1];
+      const iNow=chart.convertFromPixel({gridIndex:0},[mx,0])[0];
+      const iStart=chart.convertFromPixel({gridIndex:0},[drag.startX,0])[0];
+      if([pNow,pStart,iNow,iStart].some(v=>v==null||isNaN(v)))return;
+      const dp=pNow-pStart;
+      po.entry=+(drag.oEntry+dp).toFixed(2);po.tp=+(drag.oTp+dp).toFixed(2);po.sl=+(drag.oSl+dp).toFixed(2);
+      po.xIdx=drag.oXIdx+Math.round(iNow-iStart);
+    }else{
+      // edges → single axis resize; corners → both axes resize
+      const chgY='t tl tr'.split(' ').includes(t)||'b bl br'.split(' ').includes(t);
+      const chgX='l tl bl'.split(' ').includes(t)||'r tr br'.split(' ').includes(t);
+      if('t tl tr'.split(' ').includes(t)){const p=chart.convertFromPixel({gridIndex:0},[0,my])[1];if(p!=null&&!isNaN(p)&&p>po.entry){po.tp=+p.toFixed(2);po.tpPct=+((po.tp-po.entry)/po.entry*100).toFixed(2);}}
+      if('b bl br'.split(' ').includes(t)){const p=chart.convertFromPixel({gridIndex:0},[0,my])[1];if(p!=null&&!isNaN(p)&&p<po.entry){po.sl=+p.toFixed(2);po.slPct=+((po.sl-po.entry)/po.entry*100).toFixed(2);}}
+      if('l tl bl'.split(' ').includes(t)){const idx=chart.convertFromPixel({gridIndex:0},[mx,0])[0];if(idx!=null&&!isNaN(idx)){const ni=Math.round(idx),or=po.xIdx+po.xSpan;if(ni<or-2){po.xIdx=ni;po.xSpan=or-ni;}}}
+      if('r tr br'.split(' ').includes(t)){const idx=chart.convertFromPixel({gridIndex:0},[mx,0])[0];if(idx!=null&&!isNaN(idx))po.xSpan=Math.max(3,Math.round(idx-po.xIdx));}
+    }
+    renderPosZones();
+  }
+  function onUp(){drag=null;dragPo=null;document.body.style.cursor='';document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);}
+})();
+function maC(d,n,len){const r=[];for(let i=0;i<len;i++){if(i<n-1){r.push(null);continue;}let s=0;for(let j=0;j<n;j++)s+=d[i-j].close;r.push(s/n);}return r;}
 
 function onMM(p){
   if(!fullData.length)return;
@@ -893,7 +1027,7 @@ function enterRp(dailyIdx){
   renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
 }
-function exitRp(skipTrainEnd){stopP();rpMode=false;$('rpTgl').classList.remove('on');$('rpBdg').classList.remove('show');setRpBtns(false);if(!skipTrainEnd&&trainSession)endTrain();}
+function exitRp(skipTrainEnd){stopP();rpMode=false;$('rpTgl').classList.remove('on');$('rpBdg').classList.remove('show');setRpBtns(false);removeAllPosOverlays();if(!skipTrainEnd&&trainSession)endTrain();}
 function showAll(){exitRp();dailyVisibleLen=dailyData.length;fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;buildPad(visibleLen);savedZoom=null;renderC(visibleLen,true);if(visibleLen>0)updOHLC(fullData[visibleLen-1]);updPrg();}
 function stepF(){
   if(dailyVisibleLen>=dailyData.length){stopP();return;}
@@ -927,6 +1061,7 @@ function stepF(){
   }
   renderC(visibleLen,false);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);
+  if(posOverlays.length)renderPosZones();
   if(!playing&&curTab==='sim')renderSim();
   if(!playing&&curTab==='train'&&trainSession)renderTrain();
 }
@@ -963,11 +1098,15 @@ function renderWl(){
   }).join('');
   html+='<div class="wl-gp-add" title="新建分组">+</div></div>';
   const stocks=wlGroups[activeWlGroup]||[];
-  html+='<div class="wl-hdr"><span>'+stocks.length+'只 '+activeWlGroup+'</span><div class="wl-btns"><button class="wi" id="wlAdd2" title="添加到'+activeWlGroup+'">+</button><button class="wi" id="wlRef2" title="刷新报价">↻</button></div></div>';
+  const sortLabels=['涨幅','涨幅↓','涨幅↑'];
+  html+='<div class="wl-hdr"><span>'+stocks.length+'只 '+activeWlGroup+'</span><div class="wl-btns"><button class="wi" id="wlSort" title="按涨幅排序" style="font-size:10px;width:auto;padding:0 6px;'+(wlSortMode?'color:var(--accent)':'')+'">'+sortLabels[wlSortMode]+'</button><button class="wi" id="wlAdd2" title="添加到'+activeWlGroup+'">+</button><button class="wi" id="wlRef2" title="刷新报价">↻</button></div></div>';
   if(!stocks.length){html+='<div class="wl-e">暂无股票<br>搜索股票后点击 <b>+</b> 添加</div>';body.innerHTML=html;bindWlAll();return;}
-  html+=stocks.map(s=>{
+  let sorted=[...stocks];
+  if(wlSortMode===1)sorted.sort((a,b)=>(b.chg||0)-(a.chg||0));
+  else if(wlSortMode===2)sorted.sort((a,b)=>(a.chg||0)-(b.chg||0));
+  html+=sorted.map(s=>{
     const up=(s.chg||0)>=0,c=up?'pu':'pd';
-    return'<div class="wl-item'+(curStock&&curStock.code===s.code?' cur':'')+'" data-c="'+s.code+'" data-n="'+s.name+'" data-s="'+s.secid+'" data-m="'+(s.mkt||'')+'"><div class="wl-item-inner"><div class="wl-inf"><div class="wl-c">'+s.code+'</div><div class="wl-n">'+s.name+'</div></div><div class="wl-p"><div class="wl-l '+c+'">'+(s.lp?s.lp.toFixed(2):'--')+'</div><div class="wl-g '+c+'">'+(s.chg!=null?(up?'+':'')+s.chg.toFixed(2)+'%':'--')+'</div></div></div></div>';
+    return'<div class="wl-item'+(curStock&&curStock.code===s.code?' cur':'')+'" data-c="'+s.code+'" data-n="'+s.name+'" data-s="'+s.secid+'" data-m="'+(s.mkt||'')+'"><div class="wl-item-inner"><div class="wl-inf"><div class="wl-n">'+s.name+'</div><div class="wl-c">'+s.code+'</div></div><div class="wl-p"><div class="wl-l '+c+'">'+(s.lp?s.lp.toFixed(2):'--')+'</div><div class="wl-g '+c+'">'+(s.chg!=null?(up?'+':'')+s.chg.toFixed(2)+'%':'--')+'</div></div></div></div>';
   }).join('');
   body.innerHTML=html;bindWlAll();
 }
@@ -998,7 +1137,8 @@ function bindWlAll(){
     wlGroupNames.push(nm);wlGroups[nm]=[];activeWlGroup=nm;saveWl();renderWl();toast('已创建分组: '+nm);
   });
   // Stock header buttons
-  const a=$('wlAdd2'),r=$('wlRef2');
+  const sortBtn=$('wlSort'),a=$('wlAdd2'),r=$('wlRef2');
+  if(sortBtn)sortBtn.onclick=()=>{wlSortMode=(wlSortMode+1)%3;renderWl();};
   if(a)a.onclick=openS;
   if(r)r.onclick=()=>{refWl();toast('刷新中...');};
   // Stock item click
@@ -1019,13 +1159,18 @@ function toggleFav(){if(!curStock){toast('请先搜索股票');return;}const grp
 async function refWl(){
   const grp=wlGroups[activeWlGroup]||[];
   for(const s of grp){
-    const sinaData=await fetchSinaKline(s);
-    if(sinaData&&sinaData.length){
-      const last=sinaData[sinaData.length-1];
-      const prev=sinaData.length>1?sinaData[sinaData.length-2]:last;
-      s.lp=parseFloat(last.close);
-      s.chg=((parseFloat(last.close)-parseFloat(prev.close))/parseFloat(prev.close)*100);
-    }
+    try{
+      const data=await fetchEastmoneyKline(s);
+      const klines=data&&data.data&&data.data.klines;
+      if(klines&&klines.length){
+        const last=klines[klines.length-1].split(',');
+        const prev=klines.length>1?klines[klines.length-2].split(','):last;
+        const closeVal=parseFloat(last[2]);
+        const prevClose=parseFloat(prev[2]);
+        s.lp=closeVal;
+        s.chg=prevClose?((closeVal-prevClose)/prevClose*100):0;
+      }
+    }catch(e){console.warn('刷新报价失败:',s.code,e);}
     await new Promise(r=>setTimeout(r,100));
   }
   saveWl();
@@ -1136,7 +1281,7 @@ function simBuy(shares){
   simAccount.positions.push({id:++simIdCounter,code:curStock.code,name:curStock.name,secid:curStock.secid,shares:shares,buyPrice:d.close,buyDate:d.date});
   simAccount.history.push({id:++simIdCounter,code:curStock.code,name:curStock.name,direction:'buy',shares:shares,price:d.close,date:d.date,pnl:null,pnlPct:null});
   saveSim();const dn=(trainSession&&trainSession.blind&&!trainSession.revealed)?'???':curStock.name;toast('买入 '+dn+' '+shares+'股 @'+d.close.toFixed(2));
-  if(chart&&fullData.length){renderC(visibleLen,false);}
+  createPosOverlay(d.close,shares);
   if(curTab==='sim')renderSim();
 }
 function simSell(posId,sellShares){
@@ -1156,7 +1301,7 @@ function simSell(posId,sellShares){
   const sign=pnl>=0?'+':'';
   const sn2=(trainSession&&trainSession.blind&&!trainSession.revealed)?'???':pos.name;
   toast('卖出 '+sn2+' '+shares+'股 @'+d.close.toFixed(2)+' '+sign+pnl.toFixed(2));
-  if(chart&&fullData.length){renderC(visibleLen,false);}
+  if(chart&&fullData.length)renderC(visibleLen,false);
   if(curTab==='sim')renderSim();
   if(curTab==='train')renderTrain();
 }
@@ -1185,7 +1330,7 @@ function simSellByCode(code,sellShares){
   const sign=totalPnl>=0?'+':'';
   const sn2=(trainSession&&trainSession.blind&&!trainSession.revealed)?'???':posArr[0].name;
   toast('卖出 '+sn2+' '+totalShares+'股 @'+d.close.toFixed(2)+' '+sign+totalPnl.toFixed(2));
-  if(chart&&fullData.length){renderC(visibleLen,false);}
+  if(chart&&fullData.length)renderC(visibleLen,false);
   if(curTab==='sim')renderSim();
   if(curTab==='train')renderTrain();
 }
@@ -1194,6 +1339,7 @@ function simSellAll(){
   const cur=simAccount.positions.filter(p=>p.code===curStock.code);
   if(!cur.length){toast('无持仓可卖出');return;}
   cur.forEach(p=>simSell(p.id));
+  removeAllPosOverlays(curStock.code);
 }
 function calcSellShares(total,ratio){
   const s=Math.floor(total*ratio/100)*100;
@@ -1226,54 +1372,19 @@ function renderSim(){
   html+='<div class="sim-row"><span class="sim-k">持仓市值</span><span class="sim-v">'+posValue.toFixed(2)+'</span></div>';
   html+='<div class="sim-row"><span class="sim-k">总盈亏</span><span class="sim-v '+pc+'">'+ps+totalPnl.toFixed(2)+' ('+ps+totalPnlPct.toFixed(2)+'%)</span></div>';
   html+='</div>';
-  // 当前持仓（按股票聚合）
-  const positions=simAccount.positions;
-  const posMap={};
-  positions.forEach(p=>{
-    if(!posMap[p.code])posMap[p.code]={code:p.code,name:p.name,shares:0,cost:0,ids:[]};
-    posMap[p.code].shares+=p.shares;posMap[p.code].cost+=p.buyPrice*p.shares;posMap[p.code].ids.push(p.id);
-  });
-  const posGroups=Object.values(posMap);
-  html+='<div class="sim-section"><div class="sim-title">持仓 · '+posGroups.length+'只</div>';
-  if(!posGroups.length){html+='<div class="sim-empty">暂无持仓</div>';}
-  else{
-    posGroups.forEach(g=>{
-      const avgCost=g.cost/g.shares;
-      let unrealPnl=0,unrealPct=0,hasLive=false;
-      if(curStock&&g.code===curStock.code&&curPrice){unrealPnl=(curPrice-avgCost)*g.shares;unrealPct=(curPrice-avgCost)/avgCost*100;hasLive=true;}
-      const uc=unrealPnl>=0?'pu':'pd';const us=unrealPnl>=0?'+':'';
-      html+='<div class="sim-pos-item">';
-      html+='<div class="sim-pos-hdr"><span class="sim-pos-name">'+(isBlind&&curStock&&g.code===curStock.code?'???':g.name)+'</span><span class="sim-pos-code">'+(isBlind&&curStock&&g.code===curStock.code?'???':g.code)+'</span></div>';
-      html+='<div class="sim-pos-info">';
-      html+='<div class="sim-pos-row"><span>数量</span><span>'+g.shares+'股</span></div>';
-      html+='<div class="sim-pos-row"><span>成本均价</span><span>'+avgCost.toFixed(2)+'</span></div>';
-      if(hasLive){
-        html+='<div class="sim-pos-row"><span>现价</span><span class="'+uc+'">'+curPrice.toFixed(2)+'</span></div>';
-        html+='<div class="sim-pos-row"><span>盈亏</span><span class="'+uc+'">'+us+unrealPnl.toFixed(2)+'</span></div>';
-        html+='<div class="sim-pos-row"><span>涨跌</span><span class="'+uc+'">'+us+unrealPct.toFixed(2)+'%</span></div>';
-      }
-      html+='</div>';
-      if(curStock&&g.code===curStock.code){
-        html+='<div class="sim-sell-btns">';
-        html+='<button class="sim-sell-btn sim-sell-sm" data-code="'+g.code+'" data-ratio="0.333">卖1/3</button>';
-        html+='<button class="sim-sell-btn sim-sell-sm" data-code="'+g.code+'" data-ratio="0.5">卖1/2</button>';
-        html+='<button class="sim-sell-btn sim-sell-sm" data-code="'+g.code+'" data-ratio="1">卖出</button>';
-        html+='</div>';
-      }
-      html+='</div>';
-    });
-  }
-  html+='</div>';
   // 交易操作
   if(curStock&&dailyData.length){
     html+='<div class="sim-section sim-actions"><div class="sim-title">交易 · '+(isBlind?'???':curStock.name)+'</div>';
     html+='<div class="sim-action-info"><span>'+(d?d.date:'')+'</span><span class="sim-cur-price">'+(curPrice?curPrice.toFixed(2):'--')+'</span></div>';
     html+='<div class="sim-action-row">';
-    html+='<select class="sim-qty-sel" id="simQty"><option value="100">100股</option><option value="300">300股</option><option value="500">500股</option><option value="1000">1000股</option><option value="2000">2000股</option></select>';
     html+='<button class="sim-buy-btn" id="simBuyBtn">买入</button>';
-    const curPos=positions.filter(p=>p.code===curStock.code);
-    if(curPos.length)html+='<button class="sim-sellall-btn" id="simSellAllBtn">清仓</button>';
-    html+='</div></div>';
+    const curPos=simAccount.positions.filter(p=>p.code===curStock.code);
+    if(curPos.length){
+      html+='<button class="sim-sell-btn sim-sell-sm" data-code="'+curStock.code+'" data-ratio="0.5">卖1/2</button>';
+      html+='<button class="sim-sellall-btn" id="simSellAllBtn">清仓</button>';
+    }
+    html+='</div>';
+    html+='</div>';
   }else{
     html+='<div class="sim-section"><div class="sim-title">交易操作</div><div class="sim-no-stock">请先搜索并加载股票</div></div>';
   }
@@ -1309,7 +1420,7 @@ function renderSim(){
       else{const qty=calcSellShares(totalShares,ratio);if(qty<=0){toast('持仓不足，无法部分卖出');return;}simSellByCode(code,qty);}
     });
   });
-  const buyBtn=$('simBuyBtn');if(buyBtn)buyBtn.addEventListener('click',()=>simBuy(+$('simQty').value));
+  const buyBtn=$('simBuyBtn');if(buyBtn)buyBtn.addEventListener('click',()=>simBuy(100));
   const sellAllBtn=$('simSellAllBtn');if(sellAllBtn)sellAllBtn.addEventListener('click',()=>simSellAll());
   const resetBtn=$('simResetBtn');if(resetBtn)resetBtn.addEventListener('click',()=>{resetSim();});
 }
@@ -1359,10 +1470,8 @@ async function fetchTrainPool(){
 
 async function startRandomTrain(){
   const blindCheck=$('trainBlind');
-  const histSel=$('trainHist');
   const blind=blindCheck?blindCheck.checked:trainBlindPref;
   trainBlindPref=blind;
-  const historyDays=histSel?+histSel.value:60;
 
   // 获取股票池
   const btn=$('trainStartBtn');
@@ -1391,9 +1500,9 @@ async function startRandomTrain(){
   fullData=toViewData(curKlt,dailyVisibleLen);
   visibleLen=fullData.length;
 
-  // 随机选起始位置
-  const minIdx=Math.max(historyDays,60);
-  const maxIdx=dailyData.length-120;
+  // 随机选起始位置，前面所有历史K线可见，后面留至少60根用于回放
+  const minIdx=60;
+  const maxIdx=dailyData.length-60;
   if(maxIdx<=minIdx){
     toast('该股票数据不足，换一只');ld(false);
     if(btn){btn.disabled=false;btn.textContent='获取随机训练';}
@@ -1517,7 +1626,6 @@ function renderTrain(){
   html+='<button class="train-main-btn" id="trainStartBtn">&#x1F3B2; 获取随机训练</button>';
   html+='<div class="train-opts">';
   html+='<div class="train-opt"><label><input type="checkbox" id="trainBlind"'+((trainSession?trainSession.blind:trainBlindPref)?' checked':'')+'>盲盒模式（隐藏股票名）</label></div>';
-  html+='<div class="train-opt"><span>历史可见K线</span><select id="trainHist"><option value="30">30根</option><option value="60" selected>60根</option><option value="120">120根</option><option value="200">200根</option></select></div>';
   html+='</div></div>';
 
   // 当前训练状态
@@ -1546,47 +1654,26 @@ function renderTrain(){
     const curPrice=d?d.close:null;
     if(curStock&&curPrice){
       html+='<div class="train-trade-section">';
-      html+='<div class="train-trade-hdr"><span>'+(d?d.date:'')+'</span><span style="font-weight:700">'+(curPrice?curPrice.toFixed(2):'--')+'</span></div>';
-      html+='<div class="train-trade-row">';
-      html+='<select class="sim-qty-sel" id="trainQty"><option value="100">100股</option><option value="300">300股</option><option value="500">500股</option><option value="1000">1000股</option><option value="2000">2000股</option></select>';
+      html+='<div class="train-trade-hdr"><span>'+(d?d.date:'')+'</span><span>'+(curPrice?curPrice.toFixed(2):'--')+'</span></div>';
+      html+='<div class="sim-action-row">';
       html+='<button class="sim-buy-btn" id="trainBuyBtn">买入</button>';
-      // 当前持仓 - 显示卖出按钮
       const curPos=simAccount?simAccount.positions.filter(p=>p.code===curStock.code):[];
       if(curPos.length){
+        html+='<button class="sim-sell-btn sim-sell-sm train-sell-single" data-code="'+curStock.code+'" data-ratio="0.5">卖1/2</button>';
         html+='<button class="sim-sellall-btn" id="trainSellAllBtn">清仓</button>';
       }
       html+='</div>';
-      // 显示当前持仓简况（聚合同股票）
       if(simAccount){
-        const curPos2=simAccount.positions.filter(p=>p.code===curStock.code);
-        if(curPos2.length){
-          const totalShares=curPos2.reduce((s,p)=>s+p.shares,0);
-          const totalCost=curPos2.reduce((s,p)=>s+p.buyPrice*p.shares,0);
-          const avgCost=totalCost/totalShares;
-          const unrealPnl=(curPrice-avgCost)*totalShares;
-          const unrealPct=(curPrice-avgCost)/avgCost*100;
-          const uc=unrealPnl>=0?'pu':'pd';const us=unrealPnl>=0?'+':'';
-          html+='<div class="train-pos-row">';
-          html+='<span>'+totalShares+'股 @'+avgCost.toFixed(2)+'</span>';
-          html+='<span class="'+uc+'">'+us+unrealPnl.toFixed(2)+' ('+us+unrealPct.toFixed(2)+'%)</span>';
-          html+='</div>';
-          html+='<div class="train-pos-sell-btns">';
-          html+='<button class="sim-sell-btn sim-sell-sm train-sell-single" data-code="'+curStock.code+'" data-ratio="0.333">卖1/3</button>';
-          html+='<button class="sim-sell-btn sim-sell-sm train-sell-single" data-code="'+curStock.code+'" data-ratio="0.5">卖1/2</button>';
-          html+='<button class="sim-sell-btn sim-sell-sm train-sell-single" data-code="'+curStock.code+'" data-ratio="1">卖出</button>';
-          html+='</div>';
-        }
         html+='<div class="train-cash-row">可用: '+simAccount.cash.toFixed(2)+'</div>';
       }
       html+='</div>';
     }
 
-    html+='<div class="train-cur-actions">';
     if(trainSession.blind&&!trainSession.revealed){
+      html+='<div class="train-cur-actions">';
       html+='<button class="train-reveal-btn" id="trainRevealBtn">&#x1F50D; 揭晓答案</button>';
+      html+='</div>';
     }
-    html+='<button class="train-next-btn" id="trainNextBtn">&#x27A1; 下一题</button>';
-    html+='</div>';
     html+='</div>';
   }
 
@@ -1637,7 +1724,7 @@ function renderTrain(){
   if(nextBtn)nextBtn.addEventListener('click',()=>{endTrain();startRandomTrain();});
   // 训练面板内嵌交易按钮
   const tBuyBtn=$('trainBuyBtn');
-  if(tBuyBtn)tBuyBtn.addEventListener('click',()=>{simBuy(+$('trainQty').value);if(curTab==='train')renderTrain();});
+  if(tBuyBtn)tBuyBtn.addEventListener('click',()=>{simBuy(100);if(curTab==='train')renderTrain();});
   const tSellAllBtn=$('trainSellAllBtn');
   if(tSellAllBtn)tSellAllBtn.addEventListener('click',()=>{simSellAll();});
   body.querySelectorAll('.train-sell-single').forEach(btn=>{
@@ -1655,7 +1742,7 @@ function renderTrain(){
 }
 
 // ===== Init =====
-loadSt();loadSim();loadTrainStats();renderTab();refWl();
+loadSt();loadSim();loadTrainStats();renderTab();refWl();startRandomTrain();
 })();
 </script>
 </body>
