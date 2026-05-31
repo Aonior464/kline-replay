@@ -223,6 +223,10 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
 
 .ld{position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);z-index:50;transform-origin:left;animation:lp 1.2s ease-in-out infinite;display:none}
 .ld.show{display:block}@keyframes lp{0%{transform:scaleX(0)}50%{transform:scaleX(.6)}100%{transform:scaleX(1);opacity:0}}
+.chart-loading{position:absolute;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:rgba(255,255,255,.7);z-index:40;font-size:13px;color:#787b86;backdrop-filter:blur(2px)}
+.chart-loading.show{display:flex}
+.ch-spinner{width:22px;height:22px;border:2.5px solid #e0e3eb;border-top-color:var(--accent);border-radius:50%;animation:chSpin .7s linear infinite}
+@keyframes chSpin{to{transform:rotate(360deg)}}
 .toast{position:fixed;bottom:64px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:#fff;padding:10px 20px;border-radius:8px;font-size:12px;z-index:200;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -234,7 +238,7 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
   <div class="td"></div>
   <div class="tg pi" id="pi" style="display:none"><span class="pr" id="cp">--</span><span class="cg" id="cc">--</span></div>
   <div class="td" id="pd2" style="display:none"></div>
-  <div class="tg" id="pg"><button class="per act" data-k="101">日K</button><button class="per" data-k="102">周K</button><button class="per" data-k="103">月K</button></div>
+  <div class="tg" id="pg"><button class="per" data-k="fs">分时</button><button class="per act" data-k="101">日K</button><button class="per" data-k="102">周K</button><button class="per" data-k="103">月K</button></div>
   <div class="ts"></div>
   <div class="tg">
     <button class="tb fav-btn" id="bFav" title="收藏" style="display:none"><svg viewBox="0 0 24 24" style="width:16px;height:16px"><path id="favIc" d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg></button>
@@ -254,6 +258,7 @@ button{font-family:var(--font);cursor:pointer;border:none;outline:none}
       <div class="ohlc-bar" id="ohlc"></div>
       <div class="rp-badge" id="rpBdg"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>回放中</div>
       <div id="posOverlayWrap"></div>
+      <div class="chart-loading" id="chLoad"><div class="ch-spinner"></div>加载中</div>
       <div id="kc"></div>
       <div class="chart-hint" id="chHint">
         <svg viewBox="0 0 24 24" style="width:44px;height:44px;fill:var(--border)"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
@@ -391,6 +396,81 @@ async function tryJsonp(hosts, pathFn, callbackParam='cb'){
     }
   }
   return null;
+}
+
+// 分时图数据获取
+let tsData=[], tsMode=false, tsPrevClose=0;
+async function fetchTimeShare(stock){
+  if(!stock)return null;
+  const secid=stock.secid;
+  try{
+    const res=await fetch(BACKEND_URL+'/api/realtime/kline?secid='+encodeURIComponent(secid)+'&frequency=1m&count=242');
+    if(!res.ok)return null;
+    const json=await res.json();
+    if(!json.data||!json.data.klines||!json.data.klines.length)return null;
+    const all=[];
+    for(const line of json.data.klines){
+      const p=line.split(',');
+      all.push({time:p[0],open:+p[1],close:+p[2],high:+p[3],low:+p[4],vol:+p[5]});
+    }
+    // 只保留最后一个交易日
+    const lastDate=all[all.length-1].time.split(' ')[0];
+    const arr=all.filter(d=>d.time.startsWith(lastDate));
+    return arr;
+  }catch(e){
+    console.warn('分时数据获取失败:',e);
+    return null;
+  }
+}
+
+function renderTimeShareChart(data,prevClose){
+  if(!chart||!data||!data.length)return;
+  const times=data.map(d=>d.time.includes(' ')?d.time.split(' ')[1]:d.time);
+  const prices=data.map(d=>d.close);
+  const vols=data.map(d=>({value:d.vol,itemStyle:{color:d.close>=d.open?'rgba(239,83,80,.35)':'rgba(38,166,154,.35)'}}));
+  // 均价线: 累计成交额/累计成交量 (用close*vol近似)
+  let cumAmt=0,cumVol=0;
+  const avgPrices=data.map(d=>{cumAmt+=d.close*d.vol;cumVol+=d.vol;return cumVol?+(cumAmt/cumVol).toFixed(4):d.close;});
+  const ref=prevClose||data[0].open;
+  const opt={
+    backgroundColor:'#fff',animation:false,legend:{show:false},
+    tooltip:{
+      trigger:'axis',axisPointer:{type:'cross',crossStyle:{color:'#787b86',width:1},lineStyle:{color:'#787b86',width:1,type:'dashed'}},
+      backgroundColor:'rgba(255,255,255,.96)',borderColor:'var(--border)',borderWidth:1,
+      textStyle:{color:'#131722',fontSize:11},padding:[8,12],
+      formatter:function(params){
+        if(!params||!params.length)return'';
+        const i=params[0].dataIndex;const d=data[i];if(!d)return'';
+        const chg=ref?((d.close-ref)/ref*100):0;
+        const up=d.close>=ref;const c=up?'#ef5350':'#26a69a';
+        return`<div style="font-weight:600;margin-bottom:4px">${d.time}</div>`+
+          `<div style="display:grid;grid-template-columns:auto auto;gap:2px 12px;font-size:11px">`+
+          `<span style="color:#787b86">价格</span><span style="color:${c};font-weight:500">${d.close.toFixed(2)}</span>`+
+          `<span style="color:#787b86">均价</span><span style="color:#f5a623;font-weight:500">${avgPrices[i].toFixed(2)}</span>`+
+          `<span style="color:#787b86">涨跌</span><span style="color:${c};font-weight:500">${chg>=0?'+':''}${chg.toFixed(2)}%</span>`+
+          `<span style="color:#787b86">成交量</span><span style="font-weight:500">${fV(d.vol)}</span></div>`;
+      }
+    },
+    axisPointer:{link:[{xAxisIndex:'all'}],label:{backgroundColor:'#505862',color:'#fff',fontSize:10,padding:[3,6]}},
+    grid:[{left:10,right:56,top:30,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
+    xAxis:[
+      {type:'category',data:times,gridIndex:0,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{color:'#787b86',fontSize:10},splitLine:{show:true,lineStyle:{color:'rgba(224,227,235,.35)'}},boundaryGap:false,axisPointer:{label:{show:true},snap:true}},
+      {type:'category',data:times,gridIndex:1,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{show:false},splitLine:{show:false},boundaryGap:false,axisPointer:{label:{show:false}}}
+    ],
+    yAxis:[
+      {scale:true,gridIndex:0,position:'right',axisLine:{show:false},axisTick:{show:false},splitLine:{lineStyle:{color:'rgba(224,227,235,.4)'}},axisLabel:{color:'#787b86',fontSize:10,margin:6}},
+      {scale:true,gridIndex:1,position:'right',axisLine:{show:false},axisTick:{show:false},splitLine:{show:false},axisLabel:{color:'#787b86',fontSize:9,margin:6,formatter:v=>fV(v)}}
+    ],
+    dataZoom:[{type:'inside',xAxisIndex:[0,1],start:0,end:100}],
+    series:[
+      {name:'价格',type:'line',xAxisIndex:0,yAxisIndex:0,data:prices,showSymbol:false,lineStyle:{width:1.5,color:'#1976d2'},areaStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(25,118,210,.15)'},{offset:1,color:'rgba(25,118,210,.02)'}]}},
+        markLine:{silent:true,symbol:'none',lineStyle:{color:'#787b86',type:'dashed',width:1,opacity:.4},label:{position:'end',formatter:ref.toFixed(2),color:'#787b86',fontSize:10},data:[{yAxis:ref}]}
+      },
+      {name:'均价',type:'line',xAxisIndex:0,yAxisIndex:0,data:avgPrices,showSymbol:false,lineStyle:{width:1,color:'#f5a623',type:'solid'}},
+      {name:'V',type:'bar',xAxisIndex:1,yAxisIndex:1,data:vols,barMaxWidth:3}
+    ]
+  };
+  chart.setOption(opt,true);
 }
 
 // 本地后端获取K线
@@ -532,7 +612,7 @@ $('symBtn').addEventListener('click',openS);
 
 // ===== Data =====
 async function loadK(restoreDate, restoreRp){
-  if(!curStock)return;exitRp();ld(true);$('chHint').classList.add('hidden');
+  if(!curStock)return;exitRp();ld(true);$('chLoad').classList.add('show');$('chHint').classList.add('hidden');
   console.log('loadK: 加载股票', curStock);
 
   // 使用东方财富API（始终获取日K）
@@ -540,7 +620,7 @@ async function loadK(restoreDate, restoreRp){
   if(!data||!data.data||!data.data.klines||!data.data.klines.length){
     toast('未获取到K线数据，请检查网络');
     console.error('东方财富API无数据:', data);
-    ld(false);
+    ld(false);$('chLoad').classList.remove('show');
     return;
   }
 
@@ -570,7 +650,7 @@ async function loadK(restoreDate, restoreRp){
     if(curTab==='sim')renderSim();
     removeAllPosOverlays();
   }catch(e){console.error('loadK render error:',e);toast('渲染失败: '+e.message);}
-  ld(false);
+  ld(false);$('chLoad').classList.remove('show');
 }
 function parseD(r){
   dailyData=r.klines.map(l=>{const p=l.split(',');return{date:p[0],open:+p[1],close:+p[2],high:+p[3],low:+p[4],vol:+p[5],amt:+p[6],amp:p[7],chg:+p[8],chgA:+p[9],turn:p[10]};});
@@ -998,7 +1078,7 @@ function onMM(p){
 }
 function updOHLC(d){
   if(!d)return;const up=d.close>=d.open,c=up?'var(--up)':'var(--dn)';
-  const pn=curKlt==='101'?'日K':curKlt==='102'?'周K':'月K';
+  const pn=curKlt==='fs'?'分时':curKlt==='101'?'日K':curKlt==='102'?'周K':'月K';
   const isBlind=trainSession&&trainSession.blind&&!trainSession.revealed;
   const sName=isBlind?'???':(curStock?curStock.name:'');
   $('ohlc').innerHTML=`<span class="ot">${sName} ${pn}</span><span><span class="ol">开 </span><span class="ov" style="color:${c}">${d.open.toFixed(2)}</span></span><span><span class="ol">高 </span><span class="ov" style="color:${c}">${d.high.toFixed(2)}</span></span><span><span class="ol">低 </span><span class="ov" style="color:${c}">${d.low.toFixed(2)}</span></span><span><span class="ol">收 </span><span class="ov" style="color:${c}">${d.close.toFixed(2)}</span></span><span><span class="ov" style="color:${c}">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span></span><span><span class="ol">量 </span><span class="ov" style="color:var(--text2)">${fV(d.vol)}</span></span>`;
@@ -1222,17 +1302,38 @@ $('bPv').addEventListener('click',()=>{if(rpMode){stopP();stepB();}});
 $('bNx').addEventListener('click',()=>{if(rpMode){stopP();stepF();}});
 $('prg').addEventListener('input',()=>{if(!rpMode)return;stopP();dailyVisibleLen=+$('prg').value;if(dailyVisibleLen<1)dailyVisibleLen=1;if(dailyVisibleLen>dailyData.length)dailyVisibleLen=dailyData.length;fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;buildPad(visibleLen);renderC(visibleLen,false);updPrg();if(visibleLen>0)updOHLC(fullData[visibleLen-1]);if(curTab==='sim')renderSim();});
 $('spd').addEventListener('change',()=>{playSpd=+$('spd').value;});
-$('pg').addEventListener('click',e=>{
+$('pg').addEventListener('click',async e=>{
   const b=e.target.closest('.per');if(!b)return;
   const newKlt=b.dataset.k;if(newKlt===curKlt)return;
   $('pg').querySelector('.act').classList.remove('act');b.classList.add('act');
-  const zoomRange=getZoomDateRange();
+  const wasTs=tsMode;
   curKlt=newKlt;stopP();
+  if(newKlt==='fs'){
+    if(!curStock){toast('请先选择股票');return;}
+    tsMode=true;
+    $('ldBar').style.width='30%';
+    // 获取昨收价
+    if(dailyData.length>=2)tsPrevClose=dailyData[dailyData.length-2].close;
+    else if(dailyData.length===1)tsPrevClose=dailyData[0].open;
+    else tsPrevClose=0;
+    const data=await fetchTimeShare(curStock);
+    $('ldBar').style.width='0';
+    if(!data||!data.length){toast('暂无分时数据（非交易时段）');return;}
+    tsData=data;
+    renderTimeShareChart(tsData,tsPrevClose);
+    const last=tsData[tsData.length-1];
+    const chg=tsPrevClose?((last.close-tsPrevClose)/tsPrevClose*100):0;
+    $('ohlc').innerHTML=`<span class="ot">${curStock?curStock.name:''} 分时</span><span><span class="ol">最新 </span><span class="ov" style="color:${chg>=0?'var(--up)':'var(--dn)'}">${last.close.toFixed(2)}</span></span><span><span class="ov" style="color:${chg>=0?'var(--up)':'var(--dn)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span></span>`;
+    return;
+  }
+  // 从分时切回K线
+  if(wasTs)tsMode=false;
+  const zoomRange=getZoomDateRange();
   if(!dailyData.length)return;
   fullData=toViewData(curKlt,dailyVisibleLen);visibleLen=fullData.length;
   buildPad(visibleLen);
-  if(zoomRange)restoreZoomByDate(zoomRange);else savedZoom=null;
-  renderC(visibleLen,!zoomRange);
+  if(wasTs||!zoomRange)savedZoom=null;
+  renderC(visibleLen,wasTs||!zoomRange);
   if(visibleLen>0)updOHLC(fullData[visibleLen-1]);updPrg();
 });
 $('bLt').addEventListener('click',()=>{if(!dailyData.length)return;if(rpMode){showAll();toast('已退出回放');}else{savedZoom=null;renderC(fullData.length,true);toast('已跳到最新');}});
@@ -1488,10 +1589,10 @@ async function startRandomTrain(){
 
   // 设置curStock并加载数据
   curStock={code:stock.code,name:stock.name,secid:stock.secid,mkt:stock.mkt};
-  exitRp(true);ld(true);$('chHint').classList.add('hidden');
+  exitRp(true);ld(true);$('chLoad').classList.add('show');$('chHint').classList.add('hidden');
   const data=await fetchEastmoneyKline(curStock);
   if(!data||!data.data||!data.data.klines||!data.data.klines.length){
-    toast('K线数据加载失败，换一只试试');ld(false);
+    toast('K线数据加载失败，换一只试试');ld(false);$('chLoad').classList.remove('show');
     if(btn){btn.disabled=false;btn.textContent='获取随机训练';}
     return;
   }
@@ -1504,7 +1605,7 @@ async function startRandomTrain(){
   const minIdx=60;
   const maxIdx=dailyData.length-60;
   if(maxIdx<=minIdx){
-    toast('该股票数据不足，换一只');ld(false);
+    toast('该股票数据不足，换一只');ld(false);$('chLoad').classList.remove('show');
     if(btn){btn.disabled=false;btn.textContent='获取随机训练';}
     return;
   }
@@ -1531,7 +1632,7 @@ async function startRandomTrain(){
   updSym();initChart();
   savedZoom=null;
   enterRp(startIdx);
-  ld(false);
+  ld(false);$('chLoad').classList.remove('show');
 
   // 切到模拟账户方便操作（但保持train tab状态）
   toast(blind?'随机训练已开始 · 盲盒模式':'随机训练: '+stock.name);
