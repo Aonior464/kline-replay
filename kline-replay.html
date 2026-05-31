@@ -43,23 +43,23 @@ button:active{transform:scale(0.97)}
 .chart-wrap{flex:1;min-width:0;display:flex;flex-direction:column}
 .chart-area{flex:1;min-height:0;position:relative}
 #kc{width:100%;height:100%}
-.ohlc-bar{position:absolute;top:6px;left:10px;z-index:5;font-size:11px;display:flex;flex-wrap:wrap;gap:3px 10px;pointer-events:none}
-.ohlc-bar span{white-space:nowrap} .ol{color:var(--text2)} .ov{font-weight:600} .ot{color:var(--text);font-weight:700;font-size:12px;margin-right:4px}
+/* ===== Sub Toolbar (in chart) ===== */
+.sub-toolbar{position:absolute;top:0;left:0;right:0;z-index:5;height:40px;display:flex;align-items:center;padding:0 12px;gap:10px;font-size:13px;background:var(--bg);border-bottom:1px solid var(--border-l)}
+.sub-toolbar .ot{font-weight:700;font-size:14px;color:var(--text);cursor:pointer;padding:4px 8px;border-radius:4px;transition:background .15s}
+.sub-toolbar .ot:hover{background:rgba(41,98,255,.08);color:var(--accent)}
+.sub-toolbar .pr{font-weight:700;font-size:15px} .sub-toolbar .cg{font-size:12px;font-weight:500}
+.sub-toolbar .fav-btn{margin-left:2px}
+.st-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;margin:0 2px}
+.sub-toolbar .per{height:30px;padding:0 12px;font-size:13px;border-radius:6px}
+
+.ohlc-bar{position:absolute;top:6px;left:10px;z-index:5;font-size:11px;display:flex;flex-wrap:wrap;gap:3px 10px;pointer-events:none;display:none}
+.ohlc-bar span{white-space:nowrap} .ol{color:var(--text2)} .ov{font-weight:600} .ohlc-bar .ot{color:var(--text);font-weight:600;font-size:11px;margin-right:4px}
 .rp-badge{display:none!important}
 .chart-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);font-size:15px;gap:10px;z-index:3}
 .chart-hint .hs{font-size:12px;color:#ccc} .chart-hint.hidden{display:none}
 .chart-hint kbd{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:var(--panel);font-family:var(--font);font-size:13px;color:var(--text2)}
 
-/* ===== Stock Info Bar ===== */
-.stock-info-bar{background:var(--bg);border-top:1px solid var(--border);flex-shrink:0;overflow:hidden}
-.sib-hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;cursor:default}
-.sib-hdr-left{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
-.sib-hdr-tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--accent-bg);color:var(--accent)}
-.sib-toggle{width:24px;height:24px;border:none;background:0;color:var(--text3);display:flex;align-items:center;justify-content:center;cursor:default}
-.sib-toggle svg{width:14px;height:14px;fill:currentColor;transition:transform .2s}
-.sib-toggle.open svg{transform:rotate(180deg)}
-.sib-body{padding:0 16px 10px;display:none}
-.sib-body.open{display:block}
+/* ===== Stock Info Sections (used in modal) ===== */
 .sib-section{margin-bottom:8px}
 .sib-section-title{font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
 .sib-tags{display:flex;flex-wrap:wrap;gap:4px}
@@ -328,17 +328,28 @@ button:active{transform:scale(0.97)}
 @keyframes skFadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .toast{position:fixed;bottom:64px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;z-index:200;opacity:0;transition:.3s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== Stock Info Modal ===== */
+.sim{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;padding-top:50px}
+.sim.show{display:flex}
+.sim-bk{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);animation:smFadeIn .2s ease}
+.sim-dlg{position:relative;width:520px;max-height:75vh;background:var(--bg);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:smSlideIn .25s ease}
+.sim-hdr{display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sim-hdr-left{display:flex;align-items:center;gap:10px}
+.sim-hdr-name{font-size:16px;font-weight:700;color:var(--text)}
+.sim-hdr-code{font-size:12px;color:var(--text3)}
+.sim-hdr-tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--accent-bg);color:var(--accent)}
+.sim-close{width:28px;height:28px;border-radius:6px;background:0;color:var(--text3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:.15s;border:none}
+.sim-close:hover{background:var(--hover);color:var(--text)}
+.sim-scroll{flex:1;overflow-y:auto;padding:16px 20px}
+.sim-scroll::-webkit-scrollbar{width:5px}.sim-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.sim-empty-msg{padding:32px 0;text-align:center;color:var(--text3);font-size:12px}
 </style>
 </head>
 <body>
 
 <div class="toolbar">
-  <div class="tg"><button class="tb sym-btn" id="symBtn" title="搜索 (/)"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><span id="sc">搜索股票</span><span class="sn" id="sn"></span></button></div>
-  <div class="td"></div>
-  <div class="tg pi" id="pi" style="display:none"><span class="pr" id="cp">--</span><span class="cg" id="cc">--</span></div>
-  <button class="fav-btn" id="bFav" title="加入自选" style="display:none"><svg viewBox="0 0 24 24"><path id="favIc" d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg><span id="favText">自选</span></button>
-  <div class="td" id="pd2" style="display:none"></div>
-  <div class="tg" id="pg"><button class="per" data-k="fs">分时</button><button class="per act" data-k="101">日K</button><button class="per" data-k="102">周K</button><button class="per" data-k="103">月K</button></div>
+  <div class="tg"><button class="tb sym-btn" id="symBtn" title="搜索 (/)"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>搜索股票</button></div>
   <div class="ts"></div>
   <div class="tg">
     <button class="tb" id="bChip" title="筹码分布"><svg viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M4 9h4v11H4zm6-4h4v15h-4zm6 8h4v7h-4z"/></svg>筹码</button>
@@ -352,6 +363,14 @@ button:active{transform:scale(0.97)}
 <div class="main">
   <div class="chart-wrap">
     <div class="chart-area">
+      <div class="sub-toolbar" id="subToolbar" style="display:none">
+        <span class="ot" id="stName"></span>
+        <span class="pr" id="cp">--</span>
+        <span class="cg" id="cc">--</span>
+        <button class="fav-btn" id="bFav" title="加入自选"><svg viewBox="0 0 24 24"><path id="favIc" d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg><span id="favText">自选</span></button>
+        <div class="st-sep"></div>
+        <div class="tg" id="pg"><button class="per" data-k="fs">分时</button><button class="per act" data-k="101">日K</button><button class="per" data-k="102">周K</button><button class="per" data-k="103">月K</button></div>
+      </div>
       <div class="ohlc-bar" id="ohlc"></div>
       <div class="rp-badge" id="rpBdg"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>回放中</div>
       <div id="posOverlayWrap"></div>
@@ -386,16 +405,7 @@ button:active{transform:scale(0.97)}
   <select class="spd-sel" id="spd" style="display:none" disabled><option value="1000" selected>1x</option></select>
   <button class="rp-tgl" id="rpTgl" style="display:none"></button>
 </div>
-<div class="stock-info-bar" id="stockInfoBar" style="display:none">
-  <div class="sib-hdr" id="sibHdr">
-    <div class="sib-hdr-left"><span id="sibTitle">公司信息</span><span class="sib-hdr-tag" id="sibIndustry"></span></div>
-    <button class="sib-toggle" id="sibToggle"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></button>
-  </div>
-  <div class="sib-body" id="sibBody">
-    <div class="sib-grid" id="sibGrid"></div>
-    <div class="sib-intro" id="sibIntro" style="display:none"></div>
-  </div>
-</div>
+<div class="sim" id="stockInfoModal"><div class="sim-bk" id="simBk"></div><div class="sim-dlg"><div class="sim-hdr"><div class="sim-hdr-left"><span class="sim-hdr-name" id="simName"></span><span class="sim-hdr-code" id="simCode"></span><span class="sim-hdr-tag" id="simIndustry"></span></div><button class="sim-close" id="simClose">&times;</button></div><div class="sim-scroll" id="simBody"></div></div></div>
 
 <div class="sm" id="sMod"><div class="sm-bk" id="sBk"></div><div class="sm-d"><div class="sm-iw"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input class="sm-i" id="sInp" placeholder="输入股票代码或名称..." autocomplete="off"></div><div class="sm-r" id="sRes"><div class="sm-sec" id="rcT" style="display:none">最近搜索</div><div id="rcL"></div><div class="sm-sec" id="rsT" style="display:none">搜索结果</div><div id="rsL"></div></div></div></div>
 <div class="toast" id="tst"></div>
@@ -563,7 +573,7 @@ function renderTimeShareChart(data,prevClose){
       }
     },
     axisPointer:{link:[{xAxisIndex:'all'}],label:{backgroundColor:'#505862',color:'#fff',fontSize:10,padding:[3,6]}},
-    grid:[{left:10,right:56,top:30,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
+    grid:[{left:10,right:56,top:46,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
     xAxis:[
       {type:'category',data:times,gridIndex:0,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{color:'#787b86',fontSize:10},splitLine:{show:true,lineStyle:{color:'rgba(224,227,235,.35)'}},boundaryGap:false,axisPointer:{label:{show:true},snap:true}},
       {type:'category',data:times,gridIndex:1,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{show:false},splitLine:{show:false},boundaryGap:false,axisPointer:{label:{show:false}}}
@@ -854,11 +864,11 @@ function buildPad(len){
 }
 function updSym(){
   if(!curStock||!dailyData.length)return;
-  $('sc').textContent=curStock.code;$('sn').textContent=curStock.name;
+  $('stName').textContent=curStock.code+' '+curStock.name;
   const L=dailyData[dailyData.length-1],up=L.chg>=0,c=up?'pu':'pd';
   $('cp').className='pr '+c;$('cp').textContent=L.close.toFixed(2);
   $('cc').className='cg '+c;$('cc').textContent=(up?'+':'')+L.chgA+'  '+(up?'+':'')+L.chg.toFixed(2)+'%';
-  $('pi').style.display='flex';$('pd2').style.display='';
+  $('subToolbar').style.display='flex';
   updFavBtn();
   document.title=curStock.name+' '+L.close.toFixed(2)+' - K线回放';
 }
@@ -1157,7 +1167,7 @@ function renderC(dataLen,resetView){
       }
     },
     axisPointer:{link:[{xAxisIndex:'all'}],label:{backgroundColor:'#505862',color:'#fff',fontSize:10,padding:[3,6]}},
-    grid:[{left:10,right:56,top:30,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
+    grid:[{left:10,right:56,top:46,bottom:'26%'},{left:10,right:56,top:'78%',bottom:20}],
     xAxis:[
       {type:'category',data:pd.dates,gridIndex:0,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{color:'#787b86',fontSize:10},splitLine:{show:true,lineStyle:{color:'rgba(224,227,235,.35)'}},boundaryGap:true,axisPointer:{label:{show:true},snap:true}},
       {type:'category',data:pd.dates,gridIndex:1,axisLine:{lineStyle:{color:'#e0e3eb'}},axisTick:{show:false},axisLabel:{show:false},splitLine:{show:false},boundaryGap:true,axisPointer:{label:{show:false}}}
@@ -1309,9 +1319,7 @@ function onMM(p){
 }
 function updOHLC(d){
   if(!d)return;const up=d.close>=d.open,c=up?'var(--up)':'var(--dn)';
-  const pn=curKlt==='fs'?'分时':curKlt==='101'?'日K':curKlt==='102'?'周K':'月K';
-  const sName=curStock?curStock.name:'';
-  $('ohlc').innerHTML=`<span class="ot">${sName} ${pn}</span><span><span class="ol">开 </span><span class="ov" style="color:${c}">${d.open.toFixed(2)}</span></span><span><span class="ol">高 </span><span class="ov" style="color:${c}">${d.high.toFixed(2)}</span></span><span><span class="ol">低 </span><span class="ov" style="color:${c}">${d.low.toFixed(2)}</span></span><span><span class="ol">收 </span><span class="ov" style="color:${c}">${d.close.toFixed(2)}</span></span><span><span class="ov" style="color:${c}">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span></span><span><span class="ol">量 </span><span class="ov" style="color:var(--text2)">${fV(d.vol)}</span></span>`;
+  $('ohlc').innerHTML=`<span><span class="ol">开 </span><span class="ov" style="color:${c}">${d.open.toFixed(2)}</span></span><span><span class="ol">高 </span><span class="ov" style="color:${c}">${d.high.toFixed(2)}</span></span><span><span class="ol">低 </span><span class="ov" style="color:${c}">${d.low.toFixed(2)}</span></span><span><span class="ol">收 </span><span class="ov" style="color:${c}">${d.close.toFixed(2)}</span></span><span><span class="ov" style="color:${c}">${d.chg>=0?'+':''}${d.chg.toFixed(2)}%</span></span><span><span class="ol">量 </span><span class="ov" style="color:var(--text2)">${fV(d.vol)}</span></span>`;
 }
 function onDbl(p){if(!fullData.length)return;const i=p.dataIndex;if(i==null||i<0||i>=fullData.length)return;const z=chart.getOption().dataZoom[0];savedZoom={start:z.start,end:z.end};const clickDate=fullData[i].date;const dailyIdx=findDailyDateIdx(clickDate)+1;enterRp(dailyIdx);toast('从 '+fullData[i].date+' 开始回放');}
 
@@ -1573,7 +1581,7 @@ $('pg').addEventListener('click',async e=>{
     renderTimeShareChart(tsData,tsPrevClose);
     const last=tsData[tsData.length-1];
     const chg=tsPrevClose?((last.close-tsPrevClose)/tsPrevClose*100):0;
-    $('ohlc').innerHTML=`<span class="ot">${curStock?curStock.name:''} 分时</span><span><span class="ol">最新 </span><span class="ov" style="color:${chg>=0?'var(--up)':'var(--dn)'}">${last.close.toFixed(2)}</span></span><span><span class="ov" style="color:${chg>=0?'var(--up)':'var(--dn)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span></span>`;
+    $('ohlc').innerHTML=`<span><span class="ol">最新 </span><span class="ov" style="color:${chg>=0?'var(--up)':'var(--dn)'}">${last.close.toFixed(2)}</span></span><span><span class="ov" style="color:${chg>=0?'var(--up)':'var(--dn)'}">${chg>=0?'+':''}${chg.toFixed(2)}%</span></span>`;
     return;
   }
   // 从分时切回K线
@@ -1599,11 +1607,13 @@ function togglePanel(){
 $('bRp').addEventListener('click',togglePanel);
 $('bRpOpen').addEventListener('click',togglePanel);
 $('bFs').addEventListener('click',tFs);
-$('sibHdr').addEventListener('click',()=>{$('sibBody').classList.toggle('open');$('sibToggle').classList.toggle('open');});
+$('simBk').addEventListener('click',closeStockInfo);$('simClose').addEventListener('click',closeStockInfo);
+$('stName').addEventListener('click',openStockInfo);
 $('bFav').addEventListener('click',toggleFav);
 function tFs(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen().catch(()=>{});}
 document.addEventListener('keydown',e=>{
   if($('sMod').classList.contains('show'))return;
+  if($('stockInfoModal').classList.contains('show')){if(e.key==='Escape')closeStockInfo();return;}
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   switch(e.key){
     case'/':e.preventDefault();openS();break;
@@ -1924,7 +1934,7 @@ async function fetchStockProfile(){
     ]);
     if(profRes.ok){const j=await profRes.json();if(j.data)curStockProfile=j.data;}
     if(chainRes.ok){const j=await chainRes.json();if(j.data)curStockChain=j.data;}
-    renderStockInfoBar();
+    if($('stockInfoModal').classList.contains('show'))renderStockInfoModal();
   }catch(e){console.warn('fetchStockProfile error:',e);}
 }
 let curEtfHoldings=null;
@@ -1938,7 +1948,7 @@ async function fetchEtfHoldings(){
     const j=await res.json();
     if(!j.data||!j.data.length)return;
     curEtfHoldings=j.data;
-    renderStockInfoBar();
+    if($('stockInfoModal').classList.contains('show'))renderStockInfoModal();
     // 批量获取涨跌
     for(const h of curEtfHoldings){
       try{
@@ -1951,42 +1961,53 @@ async function fetchEtfHoldings(){
         }
       }catch(e){}
     }
-    renderStockInfoBar();
+    if($('stockInfoModal').classList.contains('show'))renderStockInfoModal();
   }catch(e){}
 }
-function renderStockInfoBar(){
-  const bar=$('stockInfoBar'),grid=$('sibGrid');
-  const cd=curStock?curStock.code:'';
+function openStockInfo(){
+  if(!curStock)return;
+  renderStockInfoModal();
+  $('stockInfoModal').classList.add('show');
+}
+function closeStockInfo(){$('stockInfoModal').classList.remove('show');}
+
+function renderStockInfoModal(){
+  const body=$('simBody');
+  if(!curStock){body.innerHTML='<div class="sim-empty-msg">暂无股票信息</div>';return;}
+  const cd=curStock.code;
   const isEtf=isEtfCode(cd);
+  const p=curStockProfile||{};
+  const c=curStockChain||{};
+
+  $('simName').textContent=p.name||c.company||curStock.name;
+  $('simCode').textContent=cd;
+  const ind=p.industry||c.industry||'';
+  $('simIndustry').textContent=ind;
+  $('simIndustry').style.display=ind?'':'none';
+
+  let html='';
+
   if(isEtf){
-    if(!curEtfHoldings||!curEtfHoldings.length){bar.style.display='none';return;}
-    $('sibTitle').textContent=curStock.name;
-    $('sibIndustry').textContent='持仓';$('sibIndustry').style.display='';
-    let html='<table style="width:100%;border-collapse:collapse;font-size:11px">';
-    html+='<tr style="color:var(--text3);border-bottom:1px solid var(--border-l)"><td style="padding:4px 0">名称</td><td style="text-align:right;padding:4px 0">占比</td><td style="text-align:right;padding:4px 0">最新价</td><td style="text-align:right;padding:4px 0">涨跌幅</td></tr>';
+    if(!curEtfHoldings||!curEtfHoldings.length){html='<div class="sim-empty-msg">暂无持仓数据（需启动后端）</div>';body.innerHTML=html;return;}
+    html+='<div class="sib-section"><div class="sib-section-title">持仓明细</div>';
+    html+='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html+='<tr style="color:var(--text3);border-bottom:1px solid var(--border-l)"><td style="padding:6px 0">名称</td><td style="text-align:right;padding:6px 0">占比</td><td style="text-align:right;padding:6px 0">最新价</td><td style="text-align:right;padding:6px 0">涨跌幅</td></tr>';
     curEtfHoldings.forEach(h=>{
       const chg=h.chg!=null?h.chg:null;
       const cc=chg!=null?(chg>=0?'pu':'pd'):'';
       const cs=chg!=null?((chg>=0?'+':'')+chg.toFixed(2)+'%'):'--';
       html+='<tr style="border-bottom:1px solid var(--border-l)">';
-      html+='<td style="padding:5px 0;font-weight:500">'+h.name+' <span style="color:var(--text3);font-weight:400">'+h.code+'</span></td>';
-      html+='<td style="text-align:right;padding:5px 0">'+h.ratio+'%</td>';
-      html+='<td style="text-align:right;padding:5px 0">'+(h.price?h.price.toFixed(2):'--')+'</td>';
-      html+='<td style="text-align:right;font-weight:600;padding:5px 0" class="'+cc+'">'+cs+'</td>';
+      html+='<td style="padding:6px 0;font-weight:500">'+h.name+' <span style="color:var(--text3);font-weight:400">'+h.code+'</span></td>';
+      html+='<td style="text-align:right;padding:6px 0">'+h.ratio+'%</td>';
+      html+='<td style="text-align:right;padding:6px 0">'+(h.price?h.price.toFixed(2):'--')+'</td>';
+      html+='<td style="text-align:right;font-weight:600;padding:6px 0" class="'+cc+'">'+cs+'</td>';
       html+='</tr>';
     });
-    html+='</table>';
-    grid.innerHTML='<div class="sib-section">'+html+'</div>';
-    bar.style.display='';return;
+    html+='</table></div>';
+    body.innerHTML=html;return;
   }
-  if((!curStockProfile&&!curStockChain)||!curStock){bar.style.display='none';return;}
-  const p=curStockProfile||{};
-  const c=curStockChain||{};
-  $('sibTitle').textContent=p.name||c.company||curStock.name;
-  $('sibIndustry').textContent=p.industry||c.industry||'';
-  $('sibIndustry').style.display=(p.industry||c.industry)?'':'none';
 
-  let html='';
+  if(!curStockProfile&&!curStockChain){html='<div class="sim-empty-msg">加载中…（需启动后端）</div>';body.innerHTML=html;return;}
 
   // 产业链图
   if(c.chain){
@@ -2005,7 +2026,7 @@ function renderStockInfoBar(){
     html+='</div></div>';
   }
 
-  // 主营构成（横向条形图）
+  // 主营构成
   if(c.products&&c.products.length){
     const unique=[];const seen=new Set();
     c.products.forEach(p=>{if(!seen.has(p.name)){seen.add(p.name);unique.push(p);}});
@@ -2027,12 +2048,22 @@ function renderStockInfoBar(){
   // 公司简介
   if(p.intro){
     const intro=p.intro.trim().replace(/\s+/g,' ');
-    const short=intro.length>200?intro.substring(0,200)+'...':intro;
-    html+='<div class="sib-section"><div class="sib-section-title">公司简介</div><div class="sib-intro">'+short+'</div></div>';
+    html+='<div class="sib-section"><div class="sib-section-title">公司简介</div><div class="sib-intro" style="max-height:160px">'+intro+'</div></div>';
   }
 
-  grid.innerHTML=html;
-  bar.style.display='';
+  // 基本信息
+  const infoFields=[
+    ['上市日期',p.list_date],['发行价',p.ipo_price],['注册资本',p.reg_capital],
+    ['员工人数',p.employees],['董事长',p.chairman],['地区',p.region]
+  ].filter(f=>f[1]);
+  if(infoFields.length){
+    html+='<div class="sib-section"><div class="sib-section-title">基本信息</div>';
+    html+='<div class="sib-info">';
+    infoFields.forEach(f=>{html+='<div class="sib-cell"><div class="sib-k">'+f[0]+'</div><div class="sib-v">'+f[1]+'</div></div>';});
+    html+='</div></div>';
+  }
+
+  body.innerHTML=html;
 }
 
 function revealTrain(){
