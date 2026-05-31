@@ -9,6 +9,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import akshare as ak
+from Ashare import get_price as ashare_get_price
 from typing import Optional, List, Dict, Any
 import uvicorn
 from datetime import datetime
@@ -602,12 +603,62 @@ async def get_stock_info(code: str = Query(..., description="股票代码，如6
         return {"data": None, "error": str(e)}
 
 
+def _to_ashare_code(secid: str) -> str:
+    """将 secid (1.600519) 转为 Ashare 格式 (sh600519)"""
+    if "." in secid:
+        mkt, code = secid.split(".", 1)
+    else:
+        code = secid
+        mkt = "1" if code.startswith("6") else "0"
+    return ("sh" if mkt == "1" else "sz") + code
+
+
 @app.get("/api/quote")
 async def get_quote(secid: str = Query(..., description="证券ID")):
-    """获取实时报价（模拟数据）"""
+    """获取实时报价（最新1根日线）"""
     try:
+        acode = _to_ashare_code(secid)
+        df = ashare_get_price(acode, frequency='1d', count=1)
+        if df is not None and not df.empty:
+            row = df.iloc[-1]
+            return {"data": {
+                "close": float(row["close"]),
+                "open": float(row["open"]),
+                "high": float(row["high"]),
+                "low": float(row["low"]),
+                "volume": float(row["volume"]),
+            }}
         return {"data": None}
     except Exception as e:
+        print(f"实时报价失败: {e}")
+        return {"data": None}
+
+
+@app.get("/api/realtime/kline")
+async def get_realtime_kline(
+    secid: str = Query(..., description="证券ID，格式: 1.600519"),
+    frequency: str = Query("15m", description="周期: 1m,5m,15m,30m,60m"),
+    count: int = Query(48, description="获取根数")
+):
+    """获取实时分钟K线（盘中）"""
+    try:
+        acode = _to_ashare_code(secid)
+        df = ashare_get_price(acode, frequency=frequency, count=count)
+        if df is None or df.empty:
+            return {"data": None}
+        klines = []
+        prev_close = None
+        for idx, row in df.iterrows():
+            time_str = idx.strftime("%Y-%m-%d %H:%M")
+            o, c, h, l, v = float(row["open"]), float(row["close"]), float(row["high"]), float(row["low"]), float(row["volume"])
+            chg_pct = ((c - prev_close) / prev_close * 100) if prev_close else 0
+            chg_amt = (c - prev_close) if prev_close else 0
+            amp = ((h - l) / prev_close * 100) if prev_close else 0
+            klines.append(f"{time_str},{o:.2f},{c:.2f},{h:.2f},{l:.2f},{int(v)},0,{amp:.2f},{chg_pct:.2f},{chg_amt:.4f},0")
+            prev_close = c
+        return {"data": {"klines": klines, "code": secid}}
+    except Exception as e:
+        print(f"实时分钟线失败: {e}")
         return {"data": None}
 
 
