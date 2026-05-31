@@ -1,118 +1,108 @@
-# 股票K线回放系统
+# K线回放 · 模拟训练工具
 
-基于 akshare + FastAPI 的股票数据后端，配合前端K线回放工具。
+A股K线回放 + 模拟交易 + 随机训练，帮你练习看盘和交易操作。
 
-## 文件说明
+## 这个工具能干什么
 
-- `kline-replay.html` - 前端K线回放页面
-- `backend.py` - Python后端服务（FastAPI）
-- `requirements.txt` - Python依赖包
-- `start.bat` - Windows启动脚本
-- `start.sh` - Linux/Mac启动脚本
+- 搜索任意A股/ETF/可转债，查看历史K线
+- 回放模式：一根一根播放K线，模拟真实盘面
+- 模拟交易：用虚拟资金买入卖出，记录盈亏
+- 随机训练：随机抽一只股票，练习判断涨跌
+- 止盈止损标记：买入后在图上画出止盈止损区域，可拖动调整
+- 支持日K/周K/月K切换
+- 实时行情接口（盘中可用）
 
-## 快速开始
+## 第一次使用？按这个步骤来
 
-### 1. 安装依赖
+### 第 1 步：安装 Python
 
-```bash
+如果电脑上没有 Python，去这里下载安装：
+
+👉 https://www.python.org/downloads/
+
+安装时 **一定要勾选 "Add Python to PATH"**（把Python加到系统路径），然后点 Install Now。
+
+装完后打开命令提示符（按 Win+R，输入 `cmd`，回车），输入：
+
+```
+python --version
+```
+
+看到类似 `Python 3.12.x` 就说明装好了。
+
+### 第 2 步：安装依赖包
+
+还是在命令提示符里，进入项目文件夹，输入：
+
+```
+cd 你的项目路径
 pip install -r requirements.txt
 ```
 
-或者单独安装：
-```bash
-pip install fastapi uvicorn akshare pandas
+比如你把项目下载到了 `D:\kline-replay`，就输入：
+
+```
+cd D:\kline-replay
+pip install -r requirements.txt
 ```
 
-### 2. 启动后端服务
+等它装完就行，大概1-2分钟。
 
-**Windows:**
-```bash
-start.bat
-```
+### 第 3 步：启动
 
-**Linux/Mac:**
-```bash
-chmod +x start.sh
-./start.sh
-```
+**方式一：双击启动（推荐）**
 
-或者直接运行：
-```bash
-python backend.py
-```
+双击项目里的 `启动.vbs`，会自动启动后端服务并打开网页，没有任何黑窗口。
 
-服务启动后会显示：
-```
-========================================
-股票数据后端服务
-========================================
-API文档: http://localhost:8000/docs
-========================================
-```
+**方式二：手动启动**
 
-### 3. 打开前端
+1. 双击 `start.bat`（会出现一个黑窗口，不要关掉）
+2. 用浏览器打开 `kline-replay.html`
 
-在浏览器中打开 `kline-replay.html` 文件。
+### 第 4 步：开始使用
 
-前端会自动检测本地后端是否可用：
-- 如果后端启动，优先使用 akshare 数据
-- 如果后端未启动，自动降级使用东方财富API
+1. 按 `/` 键或点击左上角搜索，输入股票代码或名称
+2. 点击底部「回放」按钮进入回放模式
+3. 按空格键播放，左右方向键逐根查看
+4. 在右侧面板可以模拟买入卖出
 
-## API接口
+## 不启动后端也能用吗？
 
-### 健康检查
-```
-GET /api/health
-```
+可以。直接双击 `kline-replay.html` 打开网页就能用，数据会从东方财富公开接口获取。
 
-### 搜索股票
-```
-GET /api/search?keyword=平安银行
-```
+启动后端的好处是：
+- 股票池更全（5500+ A股 + 1000+ 可转债 + 800+ ETF）
+- 支持实时分钟线行情
+- 搜索更快
 
-### 获取K线数据
-```
-GET /api/stock/kline?secid=0.000001&klt=101&fqt=1
-```
+## 文件说明
 
-参数说明：
-- `secid`: 证券ID，格式 `市场.代码` (0=深市, 1=沪市)
-- `klt`: K线类型 (101=日K, 102=周K, 103=月K)
-- `fqt`: 复权类型 (0=不复权, 1=前复权, 2=后复权)
+| 文件 | 说明 |
+|------|------|
+| `kline-replay.html` | 主页面，浏览器打开即可使用 |
+| `backend.py` | 后端服务（提供数据接口） |
+| `Ashare.py` | 实时行情数据模块 |
+| `requirements.txt` | Python依赖包列表 |
+| `启动.vbs` | 一键启动（无黑窗口） |
+| `start.bat` | Windows启动脚本 |
+| `start.sh` | Linux/Mac启动脚本 |
 
-### 获取股票基础信息
-```
-GET /api/stock/info?secid=0.000001
-```
+## 常见问题
 
-## 使用示例
+**Q: 搜索不到股票？**
+A: 不启动后端时，搜索走东方财富接口，偶尔会慢。启动后端后搜索更全更快。
 
-### Python代码示例
+**Q: 显示"未获取到K线数据"？**
+A: 检查网络连接。如果开了代理/VPN，可能影响数据获取，关掉试试。
 
-```python
-import akshare as ak
+**Q: `pip install` 报错？**
+A: 试试换国内镜像源：`pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple`
 
-# 获取平安银行日K数据（前复权）
-df = ak.stock_zh_a_daily(
-    symbol="sz000001",
-    start_date="19910403",
-    end_date="20231027",
-    adjust="qfq"
-)
-print(df)
-
-# 获取赛力斯基础信息
-df = ak.stock_individual_basic_info_xq(symbol="SH601127")
-print(df)
-```
+**Q: 怎么关闭后端服务？**
+A: 如果用 `启动.vbs` 启动的，打开任务管理器，找到 `python` 进程结束即可。如果用 `start.bat` 启动的，关掉那个黑窗口就行。
 
 ## 数据来源
 
-- **本地后端**: akshare (从新浪/雪球等数据源爬取)
-- **降级方案**: 东方财富公开API
-
-## 注意事项
-
-1. 首次运行时，akshare 可能需要几秒钟下载股票列表
-2. 股票列表会缓存5分钟以提高性能
-3. 请合理使用，避免频繁请求造成数据源压力
+- 历史K线：akshare（新浪/腾讯）+ 东方财富（备用）
+- 实时行情：Ashare（新浪/腾讯双核心）
+- 全部免费，不需要任何API Key
