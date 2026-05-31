@@ -33,6 +33,9 @@ echo.
 echo 按 Ctrl+C 停止服务
 echo.
 
+REM 2秒后自动打开网页
+start "" cmd /c "timeout /t 2 /nobreak >nul && start "" "%~dp0kline-replay.html""
+
 python backend.py
 
 pause
