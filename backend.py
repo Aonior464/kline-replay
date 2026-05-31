@@ -28,6 +28,8 @@ app.add_middleware(
 # 缓存股票列表
 _stock_list_cache = None
 _etf_list_cache = None
+_bond_list_cache = None
+_index_list_cache = None
 _list_cache_time = None
 
 # 缓存训练股票池
@@ -88,73 +90,82 @@ BUILTIN_ETFS = [
 ]
 
 
+BUILTIN_INDICES = [
+    ("000001", "上证指数", "1"),
+    ("399001", "深证成指", "0"),
+    ("399006", "创业板指", "0"),
+    ("000300", "沪深300", "1"),
+    ("000905", "中证500", "1"),
+    ("000852", "中证1000", "1"),
+    ("000016", "上证50", "1"),
+    ("399303", "国证2000", "0"),
+    ("000688", "科创50", "1"),
+]
+
+
 def get_all_symbols() -> pd.DataFrame:
-    """获取A股股票+ETF列表（带缓存）"""
-    global _stock_list_cache, _etf_list_cache, _list_cache_time
-    # 缓存5分钟
-    if (_stock_list_cache is None or
-        _etf_list_cache is None or
-        _list_cache_time is None or
-        (datetime.now() - _list_cache_time).total_seconds() > 300):
+    """获取A股股票+ETF+可转债+指数列表（带缓存）"""
+    global _stock_list_cache, _etf_list_cache, _bond_list_cache, _index_list_cache, _list_cache_time
+    # 缓存30分钟
+    if (_list_cache_time is None or
+        (datetime.now() - _list_cache_time).total_seconds() > 1800):
+        # A股列表
         try:
-            # 获取A股列表
-            try:
-                _stock_list_cache = ak.stock_info_a_code_name()
-            except Exception as e:
-                print(f"获取A股列表失败: {e}")
+            _stock_list_cache = ak.stock_info_a_code_name()
+            print(f"A股列表: {len(_stock_list_cache)}只")
+        except Exception as e:
+            print(f"获取A股列表失败: {e}")
+            if _stock_list_cache is None:
                 _stock_list_cache = pd.DataFrame(columns=["code", "name"])
 
-            # 获取ETF列表
+        # ETF列表
+        try:
             try:
-                # 优先使用同花顺ETF实时行情接口
-                try:
-                    from datetime import datetime as dt
-                    today_str = dt.now().strftime("%Y%m%d")
-                    etf_list = ak.fund_etf_spot_ths(date=today_str)
-                    if etf_list is not None and not etf_list.empty:
-                        # 重命名列以匹配股票格式
-                        if "基金代码" in etf_list.columns and "基金名称" in etf_list.columns:
-                            etf_list = etf_list[["基金代码", "基金名称"]].rename(columns={"基金代码": "code", "基金名称": "name"})
-                            # 确保基金代码是6位字符串
-                            etf_list["code"] = etf_list["code"].astype(str).str.zfill(6)
-                            _etf_list_cache = etf_list
-                        else:
-                            raise ValueError("同花顺ETF数据列名不匹配")
-                    else:
-                        raise ValueError("同花顺ETF数据为空")
-                except Exception as e_ths:
-                    print(f"同花顺ETF接口失败，尝试东方财富接口: {e_ths}")
-                    # 降级到东方财富ETF接口
-                    etf_sh = ak.fund_etf_spot_em()
-                    if etf_sh is not None and not etf_sh.empty:
-                        # 重命名列以匹配股票格式
-                        if "代码" in etf_sh.columns and "名称" in etf_sh.columns:
-                            etf_sh = etf_sh[["代码", "名称"]].rename(columns={"代码": "code", "名称": "name"})
-                            _etf_list_cache = etf_sh
-                        else:
-                            etf_sh = pd.DataFrame(columns=["code", "name"])
-                            _etf_list_cache = etf_sh
-                    else:
-                        etf_sh = pd.DataFrame(columns=["code", "name"])
-                        _etf_list_cache = etf_sh
-            except Exception as e:
-                print(f"获取ETF列表失败，使用内置列表: {e}")
-                # 使用内置ETF列表
+                etf_list = ak.fund_etf_spot_em()
+                if etf_list is not None and not etf_list.empty and "代码" in etf_list.columns:
+                    _etf_list_cache = etf_list[["代码", "名称"]].rename(columns={"代码": "code", "名称": "name"})
+                    print(f"ETF列表: {len(_etf_list_cache)}只")
+                else:
+                    raise ValueError("ETF数据为空")
+            except Exception as e1:
+                print(f"东方财富ETF失败: {e1}")
+                if _etf_list_cache is None:
+                    _etf_list_cache = pd.DataFrame(BUILTIN_ETFS, columns=["code", "name"])
+        except Exception as e:
+            print(f"获取ETF失败: {e}")
+            if _etf_list_cache is None:
                 _etf_list_cache = pd.DataFrame(BUILTIN_ETFS, columns=["code", "name"])
 
-            _list_cache_time = datetime.now()
+        # 可转债列表
+        try:
+            bond_df = ak.bond_zh_cov()
+            if bond_df is not None and not bond_df.empty:
+                code_col = [c for c in bond_df.columns if "代码" in c]
+                name_col = [c for c in bond_df.columns if ("简称" in c or "名称" in c) and "正股" not in c]
+                if code_col and name_col:
+                    _bond_list_cache = bond_df[[code_col[0], name_col[0]]].rename(
+                        columns={code_col[0]: "code", name_col[0]: "name"})
+                    _bond_list_cache["code"] = _bond_list_cache["code"].astype(str).str.zfill(6)
+                    print(f"可转债列表: {len(_bond_list_cache)}只")
+                else:
+                    _bond_list_cache = pd.DataFrame(columns=["code", "name"])
+            else:
+                _bond_list_cache = pd.DataFrame(columns=["code", "name"])
         except Exception as e:
-            print(f"获取列表失败: {e}")
-            # 失败时至少返回内置ETF
-            return pd.DataFrame(BUILTIN_ETFS, columns=["code", "name"])
+            print(f"获取可转债失败: {e}")
+            if _bond_list_cache is None:
+                _bond_list_cache = pd.DataFrame(columns=["code", "name"])
 
-    # 合并股票和ETF
+        # 指数列表（内置）
+        _index_list_cache = pd.DataFrame(
+            [(c, n) for c, n, _ in BUILTIN_INDICES], columns=["code", "name"])
+
+        _list_cache_time = datetime.now()
+
     dfs = []
-    if not _stock_list_cache.empty:
-        dfs.append(_stock_list_cache)
-    if not _etf_list_cache.empty:
-        dfs.append(_etf_list_cache)
-    # 如果都为空，使用内置ETF
+    for cache in [_stock_list_cache, _etf_list_cache, _bond_list_cache, _index_list_cache]:
+        if cache is not None and not cache.empty:
+            dfs.append(cache)
     if not dfs:
         return pd.DataFrame(BUILTIN_ETFS, columns=["code", "name"])
     return pd.concat(dfs, ignore_index=True)
@@ -185,16 +196,24 @@ async def search_stock(keyword: str = Query(..., description="搜索关键词"))
         results = stock_list[mask].head(30)
 
         # 转换为东方财富格式
+        index_codes = {c for c, _, _ in BUILTIN_INDICES}
+        bond_codes = set()
+        if _bond_list_cache is not None and not _bond_list_cache.empty:
+            bond_codes = set(_bond_list_cache["code"].astype(str))
         data = []
         for _, row in results.iterrows():
-            code = row["code"]
+            code = str(row["code"])
             name = row["name"]
-            # 判断市场
-            if code.startswith("6"):
-                market = 1  # 沪市
+            # 判断市场和secid
+            if code in index_codes:
+                idx_entry = next((c, n, m) for c, n, m in BUILTIN_INDICES if c == code)
+                market = int(idx_entry[2])
+                secid = f"{market}.{code}"
+            elif code.startswith("6") or code.startswith("5"):
+                market = 1
                 secid = f"1.{code}"
             else:
-                market = 0  # 深市
+                market = 0
                 secid = f"0.{code}"
 
             data.append({
