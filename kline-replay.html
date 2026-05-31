@@ -2183,17 +2183,34 @@ function renderTrain(){
     html+='</div>';
   }
 
-  // 卖出记录
+  // 交易记录：持仓（带浮盈）+ 已卖出
+  const openPos=simAccount?simAccount.positions:[];
   const sells=simAccount?[...simAccount.history].filter(t=>t.direction==='sell').reverse():[];
+  const totalCount=openPos.length+sells.length;
   html+='<div class="train-card">';
-  html+='<div class="train-card-hdr">交易记录 · '+sells.length+'笔<button class="hdr-reset-btn" id="simResetBtn">重置</button></div>';
-  if(!sells.length){html+='<div style="padding:20px 12px;text-align:center;color:var(--text3);font-size:11px">暂无卖出记录</div>';}
+  html+='<div class="train-card-hdr">交易记录 · '+totalCount+'笔<button class="hdr-reset-btn" id="simResetBtn">重置</button></div>';
+  if(!totalCount){html+='<div style="padding:20px 12px;text-align:center;color:var(--text3);font-size:11px">暂无交易记录</div>';}
   else{
+    openPos.forEach(p=>{
+      const livePrice=curPrice&&curStock&&p.code===curStock.code?curPrice:p.buyPrice;
+      const uPnlPct=(livePrice-p.buyPrice)/p.buyPrice*100;
+      const uPnl=livePrice*p.shares-p.buyPrice*p.shares;
+      const uc=uPnlPct>=0?'pu':'pd';
+      const us=uPnlPct>=0?'+':'';
+      html+='<div class="trade-record" style="border-left:3px solid var(--buy-c,#e74c3c);padding-left:9px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">';
+      html+='<span style="font-weight:500">'+p.name+' <span style="color:var(--text3);font-weight:400;font-size:10px">'+p.shares+'股</span> <span style="font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(231,76,60,0.15);color:#e74c3c">持仓中</span></span>';
+      html+='<span class="'+uc+'" style="font-weight:700;font-size:13px">'+us+uPnlPct.toFixed(2)+'%</span>';
+      html+='</div>';
+      html+='<div style="display:flex;justify-content:space-between;color:var(--text3);font-size:10px;margin-top:3px">';
+      html+='<span>'+p.buyDate+' 买入</span>';
+      html+='<span>'+p.buyPrice.toFixed(2)+' → '+livePrice.toFixed(2)+' <span class="'+uc+'">'+us+uPnl.toFixed(0)+'</span></span>';
+      html+='</div></div>';
+    });
     sells.slice(0,30).forEach(t=>{
       const tc=t.pnl>=0?'pu':'pd';
       const ts2=t.pnl>=0?'+':'';
       html+='<div class="trade-record"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">';
-      html+='<span style="font-weight:500">'+t.name+' <span style="color:var(--text3);font-weight:400;font-size:10px">'+t.shares+'股</span></span>';
+      html+='<span style="font-weight:500">'+t.name+' <span style="color:var(--text3);font-weight:400;font-size:10px">'+t.shares+'股</span> <span style="font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(100,100,100,0.15);color:var(--text3)">已卖出</span></span>';
       html+='<span class="'+tc+'" style="font-weight:700;font-size:13px">'+ts2+t.pnlPct.toFixed(2)+'%</span>';
       html+='</div>';
       html+='<div style="display:flex;justify-content:space-between;color:var(--text3);font-size:10px;margin-top:3px">';
