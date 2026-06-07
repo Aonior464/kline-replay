@@ -1,12 +1,33 @@
 Set ws = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
+Set http = CreateObject("MSXML2.XMLHTTP.6.0")
 dir = fso.GetParentFolderName(WScript.ScriptFullName)
+logFile = dir & "\backend.log"
+htmlFile = dir & "\kline-replay.html"
 
-' åå°å¯åŠ¨Pythonåç«¯ï¼ˆæ— çª—å£ï¼‰
-ws.Run "cmd /c cd /d """ & dir & """ && python backend.py", 0, False
+' ºóÌ¨Æô¶¯Pythonºó¶Ë
+ws.Run "cmd /c cd /d """ & dir & """ && python backend.py > """ & logFile & """ 2>&1", 0, False
 
-' ç­‰2ç§’è®©åç«¯å¯åŠ¨
-WScript.Sleep 2000
+' ÂÖÑ¯µÈ´ıºó¶Ë¾ÍĞ÷£¨×î¶à15Ãë£©
+ready = False
+For i = 1 To 30
+    WScript.Sleep 500
+    On Error Resume Next
+    http.Open "GET", "http://localhost:8000/api/health", False
+    http.Send
+    If Err.Number = 0 And http.Status = 200 Then
+        ready = True
+        Exit For
+    End If
+    On Error GoTo 0
+Next
 
-' æ‰“å¼€ç½‘é¡µ
-ws.Run """" & dir & "\kline-replay.html""", 1, False
+If ready Then
+    ws.Run """" & htmlFile & """", 1, False
+Else
+    msg = "ºó¶ËÆô¶¯Ê§°Ü£¬Çë¼ì²é£º" & vbCrLf & vbCrLf
+    msg = msg & "1. Python ÊÇ·ñÒÑ°²×°" & vbCrLf
+    msg = msg & "2. ÒÀÀµÊÇ·ñÒÑ°²×° (pip install -r requirements.txt)" & vbCrLf
+    msg = msg & "3. ²é¿´ backend.log ÁË½âÏêÇé"
+    MsgBox msg, vbExclamation, "KÏß»Ø·Å"
+End If

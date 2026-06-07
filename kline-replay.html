@@ -1485,41 +1485,56 @@ function rmWl(code){const grp=wlGroups[activeWlGroup];if(grp)wlGroups[activeWlGr
 function isInWl(){if(!curStock)return false;return(wlGroups[activeWlGroup]||[]).some(s=>s.code===curStock.code);}
 function updFavBtn(){const btn=$('bFav'),ic=$('favIc'),tx=$('favText');if(!btn)return;if(!curStock){btn.style.display='none';return;}btn.style.display='flex';const inWl=isInWl();btn.classList.toggle('faved',inWl);btn.title=inWl?'取消收藏':'加入自选 '+activeWlGroup;if(tx)tx.textContent=inWl?'已自选':'自选';if(ic)ic.setAttribute('d',inWl?'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z':'M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z');}
 function toggleFav(){if(!curStock){toast('请先搜索股票');return;}const grp=wlGroups[activeWlGroup]||(wlGroups[activeWlGroup]=[]);const idx=grp.findIndex(s=>s.code===curStock.code);if(idx>=0){grp.splice(idx,1);toast(curStock.name+' 已取消收藏');}else{const L=dailyData.length?dailyData[dailyData.length-1]:null;grp.push({code:curStock.code,name:curStock.name,secid:curStock.secid,mkt:curStock.mkt,lp:L?L.close:null,chg:L?L.chg:null});toast(curStock.name+' 已加入 '+activeWlGroup);}saveWl();updFavBtn();if(curTab==='wl')renderWl();}
-async function fetchQuote(stock){
-  if(await checkBackend()){
-    try{
-      const res=await fetch(BACKEND_URL+'/api/stock/quote?secid='+encodeURIComponent(stock.secid));
-      if(res.ok){const j=await res.json();if(j&&j.data)return j;}
-    }catch(e){}
-  }
-  const pathFn=()=>'/api/qt/stock/get?secid='+stock.secid+'&fields=f43,f44,f45,f46,f47,f48,f60,f170';
-  return await tryJsonp(['push2.eastmoney.com','push2his.eastmoney.com'],pathFn,'callback');
-}
 async function refWl(){
   const grp=wlGroups[activeWlGroup]||[];
   if(!grp.length)return;
+  // 优先用后端批量报价接口（腾讯行情，极快）
+  if(await checkBackend()){
+    try{
+      const secids=grp.map(s=>s.secid).join(',');
+      const res=await fetch(BACKEND_URL+'/api/stock/quote?secids='+encodeURIComponent(secids));
+      if(res.ok){
+        const json=await res.json();
+        if(json.data){
+          for(const s of grp){
+            const q=json.data[s.secid];
+            if(q){s.lp=q.close;s.chg=q.chgPct;}
+          }
+          saveWl();
+          if(curTab==='wl')renderWl();
+          return;
+        }
+      }
+    }catch(e){console.warn('批量报价失败:',e);}
+  }
+  // 降级：用kline缓存或逐只请求
   const BATCH=6;
   for(let i=0;i<grp.length;i+=BATCH){
     const batch=grp.slice(i,i+BATCH);
     await Promise.all(batch.map(async s=>{
       try{
-        const d=await fetchQuote(s);
-        if(d&&d.data){
-          const q=d.data;
-          if(q.f43!=null){s.lp=q.f43/100;s.chg=q.f170!=null?q.f170/100:0;}
-          else if(q.close!=null){s.lp=q.close;s.chg=q.chgPct||0;}
-        }else{
-          const data=await fetchEastmoneyKline(s);
-          const klines=data&&data.data&&data.data.klines;
+        const cached=klineCache.get(s.secid);
+        if(cached&&Date.now()-cached.ts<KLINE_CACHE_TTL){
+          const klines=cached.data&&cached.data.data&&cached.data.data.klines;
           if(klines&&klines.length){
             const last=klines[klines.length-1].split(',');
             const prev=klines.length>1?klines[klines.length-2].split(','):last;
             s.lp=parseFloat(last[2]);
-            const prevClose=parseFloat(prev[2]);
-            s.chg=prevClose?((s.lp-prevClose)/prevClose*100):0;
+            const pc=parseFloat(prev[2]);
+            s.chg=pc?((s.lp-pc)/pc*100):0;
+            return;
           }
         }
-      }catch(e){console.warn('刷新报价失败:',s.code,e);}
+        const data=await fetchEastmoneyKline(s);
+        const klines=data&&data.data&&data.data.klines;
+        if(klines&&klines.length){
+          const last=klines[klines.length-1].split(',');
+          const prev=klines.length>1?klines[klines.length-2].split(','):last;
+          s.lp=parseFloat(last[2]);
+          const pc=parseFloat(prev[2]);
+          s.chg=pc?((s.lp-pc)/pc*100):0;
+        }
+      }catch(e){}
     }));
   }
   saveWl();
@@ -1817,37 +1832,50 @@ function loadTrainStats(){
 }
 function saveTrainStats(){localStorage.setItem('trainStats',JSON.stringify(trainStats));}
 
+const FALLBACK_POOL=[
+  {code:'600519',name:'贵州茅台',secid:'1.600519',mkt:'1'},{code:'000858',name:'五粮液',secid:'0.000858',mkt:'0'},
+  {code:'601318',name:'中国平安',secid:'1.601318',mkt:'1'},{code:'600036',name:'招商银行',secid:'1.600036',mkt:'1'},
+  {code:'000333',name:'美的集团',secid:'0.000333',mkt:'0'},{code:'600900',name:'长江电力',secid:'1.600900',mkt:'1'},
+  {code:'601899',name:'紫金矿业',secid:'1.601899',mkt:'1'},{code:'600276',name:'恒瑞医药',secid:'1.600276',mkt:'1'},
+  {code:'000001',name:'平安银行',secid:'0.000001',mkt:'0'},{code:'600030',name:'中信证券',secid:'1.600030',mkt:'1'},
+  {code:'002594',name:'比亚迪',secid:'0.002594',mkt:'0'},{code:'601012',name:'隆基绿能',secid:'1.601012',mkt:'1'},
+  {code:'300750',name:'宁德时代',secid:'0.300750',mkt:'0'},{code:'002475',name:'立讯精密',secid:'0.002475',mkt:'0'},
+  {code:'600809',name:'山西汾酒',secid:'1.600809',mkt:'1'},{code:'000568',name:'泸州老窖',secid:'0.000568',mkt:'0'},
+  {code:'601288',name:'农业银行',secid:'1.601288',mkt:'1'},{code:'601398',name:'工商银行',secid:'1.601398',mkt:'1'},
+  {code:'600050',name:'中国联通',secid:'1.600050',mkt:'1'},{code:'601857',name:'中国石油',secid:'1.601857',mkt:'1'},
+  {code:'002371',name:'北方华创',secid:'0.002371',mkt:'0'},{code:'603259',name:'药明康德',secid:'1.603259',mkt:'1'},
+  {code:'000725',name:'京东方A',secid:'0.000725',mkt:'0'},{code:'601888',name:'中国中免',secid:'1.601888',mkt:'1'},
+  {code:'600887',name:'伊利股份',secid:'1.600887',mkt:'1'},{code:'000002',name:'万科A',secid:'0.000002',mkt:'0'},
+  {code:'002415',name:'海康威视',secid:'0.002415',mkt:'0'},{code:'600585',name:'海螺水泥',secid:'1.600585',mkt:'1'},
+  {code:'601166',name:'兴业银行',secid:'1.601166',mkt:'1'},{code:'300059',name:'东方财富',secid:'0.300059',mkt:'0'},
+];
 async function fetchTrainPool(){
-  // 内存缓存有效
   if(trainStockPool.length&&Date.now()<trainPoolExpiry)return trainStockPool;
-  // localStorage缓存（24小时）
   try{
     const cached=JSON.parse(localStorage.getItem('trainPool'));
     if(cached&&cached.data&&cached.data.length&&cached.expiry>Date.now()){
-      trainStockPool=cached.data;
-      trainPoolExpiry=cached.expiry;
-      console.log('股票池从缓存加载:',trainStockPool.length,'只');
+      trainStockPool=cached.data;trainPoolExpiry=cached.expiry;
       return trainStockPool;
     }
   }catch(e){}
-  // 优先后端API
   if(await checkBackend()){
     try{
-      const res=await fetch(BACKEND_URL+'/api/train/pool');
+      const controller=new AbortController();
+      const tm=setTimeout(()=>controller.abort(),8000);
+      const res=await fetch(BACKEND_URL+'/api/train/pool',{signal:controller.signal});
+      clearTimeout(tm);
       if(res.ok){
         const json=await res.json();
         if(json.data&&json.data.length){
-          trainStockPool=json.data;
-          trainPoolExpiry=Date.now()+86400000;
+          trainStockPool=json.data;trainPoolExpiry=Date.now()+86400000;
           localStorage.setItem('trainPool',JSON.stringify({data:trainStockPool,expiry:trainPoolExpiry}));
-          console.log('股票池从后端加载:',trainStockPool.length,'只');
           return trainStockPool;
         }
       }
     }catch(e){console.warn('后端股票池请求失败:',e);}
   }
-  toast('获取股票池失败，请确保后端服务已启动');
-  return null;
+  trainStockPool=FALLBACK_POOL;trainPoolExpiry=Date.now()+3600000;
+  return trainStockPool;
 }
 
 async function startRandomTrain(){

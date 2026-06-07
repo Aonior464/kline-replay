@@ -8,6 +8,13 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import os
+# 禁用代理，避免请求东方财富/新浪时走代理超时
+os.environ.pop("HTTP_PROXY", None)
+os.environ.pop("HTTPS_PROXY", None)
+os.environ.pop("http_proxy", None)
+os.environ.pop("https_proxy", None)
+os.environ["NO_PROXY"] = "*"
 import akshare as ak
 from Ashare import get_price as ashare_get_price
 from typing import Optional, List, Dict, Any
@@ -36,6 +43,20 @@ _list_cache_time = None
 # 缓存训练股票池
 _train_pool_cache = None
 _train_pool_cache_time = None
+
+# 数据源失败计数，连续失败超过阈值则临时跳过该数据源
+_source_fails = {}  # source_name -> fail_count
+_SOURCE_FAIL_THRESHOLD = 2  # 连续失败2次就跳过
+
+def _source_ok(name):
+    """检查数据源是否可用（未连续失败超过阈值）"""
+    return _source_fails.get(name, 0) < _SOURCE_FAIL_THRESHOLD
+
+def _source_success(name):
+    _source_fails[name] = 0
+
+def _source_fail(name):
+    _source_fails[name] = _source_fails.get(name, 0) + 1
 
 # 内置常用ETF列表（作为后备）
 BUILTIN_ETFS = [
@@ -366,93 +387,75 @@ async def get_kline(
         start_date = beg if beg != "0" else "19900101"
         end_date = end
 
+        adjust_map = {0: "", 1: "qfq", 2: "hfq"}
+        adjust = adjust_map.get(fqt, "qfq")
+        col_map_cn = {
+            "日期": "date", "开盘": "open", "收盘": "close", "最高": "high",
+            "最低": "low", "成交量": "volume", "成交额": "amount",
+            "振幅": "amplitude", "涨跌幅": "change_pct", "涨跌额": "change_amt", "换手率": "turnover"
+        }
+
         df = None
-        # 尝试获取股票数据（优先用东方财富数据源，复权更准确）
-        try:
-            adjust_map = {0: "", 1: "qfq", 2: "hfq"}
-            adjust = adjust_map.get(fqt, "qfq")
 
-            df = ak.stock_zh_a_hist(
-                symbol=code,
-                period="daily",
-                start_date=start_date,
-                end_date=end_date,
-                adjust=adjust
-            )
-            if df is not None and not df.empty:
-                col_map = {
-                    "日期": "date",
-                    "开盘": "open",
-                    "收盘": "close",
-                    "最高": "high",
-                    "最低": "low",
-                    "成交量": "volume",
-                    "成交额": "amount",
-                    "振幅": "amplitude",
-                    "涨跌幅": "change_pct",
-                    "涨跌额": "change_amt",
-                    "换手率": "turnover"
-                }
-                df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
-        except Exception as e:
-            print(f"东方财富股票数据获取失败，尝试新浪: {e}")
-            try:
-                if len(code) == 6:
-                    symbol = f"sh{code}" if code.startswith("6") else f"sz{code}"
-                else:
-                    symbol = code
-                df = ak.stock_zh_a_daily(
-                    symbol=symbol,
-                    start_date=start_date,
-                    end_date=end_date,
-                    adjust=adjust
-                )
-            except Exception as e2:
-                print(f"新浪股票数据也失败，尝试ETF: {e2}")
-
-        # 如果股票数据失败，尝试获取ETF数据
+        # 新浪优先（东方财富在当前网络环境下不可用）
+        # 1. 新浪股票
         if df is None or df.empty:
-            try:
-                # 优先使用东方财富ETF接口（支持前复权）
-                df = ak.fund_etf_hist_em(
-                    symbol=code,
-                    period="daily",
-                    start_date=start_date,
-                    end_date=end_date,
-                    adjust="qfq" if fqt == 1 else ("hfq" if fqt == 2 else "")
-                )
-                if df is not None and not df.empty:
-                    col_map = {
-                        "日期": "date",
-                        "开盘": "open",
-                        "收盘": "close",
-                        "最高": "high",
-                        "最低": "low",
-                        "成交量": "volume",
-                        "成交额": "amount",
-                        "振幅": "amplitude",
-                        "涨跌幅": "change_pct",
-                        "涨跌额": "change_amt",
-                        "换手率": "turnover"
-                    }
-                    df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
-            except Exception as e2:
-                print(f"东方财富ETF接口失败，尝试新浪: {e2}")
+            if _source_ok("sina_stock"):
                 try:
-                    if code.startswith("5") or code.startswith("6"):
-                        sina_symbol = f"sh{code}"
+                    symbol = (f"sh{code}" if code.startswith("6") else f"sz{code}") if len(code) == 6 else code
+                    df = ak.stock_zh_a_daily(symbol=symbol, start_date=start_date, end_date=end_date, adjust=adjust)
+                    if df is not None and not df.empty:
+                        _source_success("sina_stock")
                     else:
-                        sina_symbol = f"sz{code}"
+                        df = None
+                except Exception as e:
+                    _source_fail("sina_stock")
+
+        # 2. 新浪ETF
+        if df is None or df.empty:
+            if _source_ok("sina_etf"):
+                try:
+                    sina_symbol = f"sh{code}" if (code.startswith("5") or code.startswith("6")) else f"sz{code}"
                     df = ak.fund_etf_hist_sina(symbol=sina_symbol)
                     if df is not None and not df.empty:
-                        col_map = {"date": "date", "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume"}
-                        df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
+                        col_map_en = {"date": "date", "open": "open", "high": "high", "low": "low", "close": "close", "volume": "volume"}
+                        df = df.rename(columns={k: v for k, v in col_map_en.items() if k in df.columns})
                         if "date" in df.columns:
                             df["date"] = pd.to_datetime(df["date"])
                             df = df[(df["date"] >= pd.to_datetime(start_date)) & (df["date"] <= pd.to_datetime(end_date))]
                             df["date"] = df["date"].dt.strftime("%Y-%m-%d")
-                except Exception as e3:
-                    print(f"新浪ETF接口也失败: {e3}")
+                        _source_success("sina_etf")
+                    else:
+                        df = None
+                except Exception as e:
+                    _source_fail("sina_etf")
+
+        # 3. 东方财富股票（备用）
+        if df is None or df.empty:
+            if _source_ok("em_stock"):
+                try:
+                    df = ak.stock_zh_a_hist(symbol=code, period="daily", start_date=start_date, end_date=end_date, adjust=adjust)
+                    if df is not None and not df.empty:
+                        df = df.rename(columns={k: v for k, v in col_map_cn.items() if k in df.columns})
+                        _source_success("em_stock")
+                    else:
+                        df = None
+                except Exception as e:
+                    _source_fail("em_stock")
+
+        # 4. 东方财富ETF（备用）
+        if df is None or df.empty:
+            if _source_ok("em_etf"):
+                try:
+                    df = ak.fund_etf_hist_em(symbol=code, period="daily", start_date=start_date, end_date=end_date,
+                                             adjust="qfq" if fqt == 1 else ("hfq" if fqt == 2 else ""))
+                    if df is not None and not df.empty:
+                        df = df.rename(columns={k: v for k, v in col_map_cn.items() if k in df.columns})
+                        _source_success("em_etf")
+                    else:
+                        df = None
+                except Exception as e:
+                    _source_fail("em_etf")
 
         if df is None or df.empty:
             return {"data": None}
@@ -568,6 +571,54 @@ async def get_money_flow(secid: str = Query(..., description="证券ID")):
         }
     except Exception as e:
         return {"data": None}
+
+
+@app.get("/api/stock/quote")
+async def get_stock_quote(secids: str = Query(..., description="证券ID列表，逗号分隔，如 1.600519,0.000858")):
+    """批量获取实时报价（腾讯接口，极快）"""
+    import urllib.request
+    try:
+        id_list = [s.strip() for s in secids.split(",") if s.strip()]
+        # secid (1.600519) -> 腾讯格式 (sh600519)
+        tencent_codes = []
+        for sid in id_list:
+            parts = sid.split(".")
+            if len(parts) == 2:
+                code = parts[1]
+                prefix = "sh" if parts[0] == "1" else "sz"
+                tencent_codes.append(f"{prefix}{code}")
+            else:
+                tencent_codes.append(sid)
+
+        url = f"https://qt.gtimg.cn/q={','.join(tencent_codes)}"
+        handler = urllib.request.ProxyHandler({})
+        opener = urllib.request.build_opener(handler)
+        resp = opener.open(url, timeout=5)
+        data = resp.read().decode("gbk")
+
+        results = {}
+        for line in data.strip().split(";"):
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split("~")
+            if len(parts) > 45:
+                raw_key = line.split("=")[0] if "=" in line else ""
+                code = parts[2] if len(parts) > 2 else ""
+                mkt = "1" if raw_key.endswith(f"sh{code}") or code.startswith("6") else "0"
+                secid = f"{mkt}.{code}"
+                try:
+                    results[secid] = {
+                        "name": parts[1],
+                        "close": float(parts[3]) if parts[3] else 0,
+                        "chgPct": float(parts[32]) if parts[32] else 0,
+                    }
+                except (ValueError, IndexError):
+                    pass
+        return {"data": results}
+    except Exception as e:
+        print(f"批量报价失败: {e}")
+        return {"data": {}}
 
 
 @app.get("/api/train/pool")
@@ -896,6 +947,19 @@ async def get_etf_holdings(code: str = Query(..., description="ETF代码")):
     except Exception as e:
         print(f"获取ETF持仓失败 {code}: {e}")
         return {"data": []}
+
+
+@app.on_event("startup")
+async def preload_train_pool():
+    """启动时后台预加载股票池"""
+    import asyncio
+    async def _load():
+        try:
+            await get_train_pool()
+            print("✓ 股票池预加载完成")
+        except Exception as e:
+            print(f"✗ 股票池预加载失败: {e}")
+    asyncio.create_task(_load())
 
 
 if __name__ == "__main__":
